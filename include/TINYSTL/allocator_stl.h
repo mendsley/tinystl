@@ -24,22 +24,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <TINYSTL/vector.h>
-#include <TINYSTL/allocator_stl.h>
-#include <memory>
+#ifndef TINYSTL_ALLOCATOR_STL_H
+#define TINYSTL_ALLOCATOR_STL_H
 
-int main()
-{
-	tinystl::vector<int, tinystl::allocator_stl<std::allocator<int> > > v;
-	v.reserve(200);
-	for (int ii = 0; ii < 200; ++ii)
-		v.push_back(ii);
+#include <stddef.h>
 
-	tinystl::vector<int, tinystl::allocator_stl< std::allocator<int> > > o = v;
-	o.resize(o.size() / 2);
-	v = o;
-	o.resize(0);
+namespace tinystl {
 
-	printf( "Hello %d\n", (int)v.size() );
+	// Converts an standard STL allocator interface to a tinystl allocator
+	template<typename STLAllocator>
+	struct allocator_stl
+	{
+		static void* allocate(size_t size)
+		{
+			STLAllocator a;
+			return a.allocate(size);
+		}
+
+		static void deallocate(void* ptr, size_t bytes)
+		{
+			STLAllocator a;
+			a.deallocate((typename STLAllocator::pointer)ptr, bytes);
+		}
+	};
 }
+
+#endif

@@ -62,8 +62,6 @@ namespace tinystl {
 	private:
 		typedef T* pointer;
 
-		void grow(size_t size);
-
 		T* m_first;
 		T* m_last;
 		T* m_capacity;

@@ -27,7 +27,7 @@
 #ifndef TINYSTL_ALLOCATOR_STL_H
 #define TINYSTL_ALLOCATOR_STL_H
 
-#include <stddef.h>
+#include <TINYSTL/stddef.h>
 
 namespace tinystl {
 

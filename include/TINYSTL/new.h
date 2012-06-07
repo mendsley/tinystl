@@ -24,25 +24,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TINYSTL_ALLOCATOR_H
-#define TINYSTL_ALLOCATOR_H
+#ifndef TINYSTL_NEW_H
+#define TINYSTL_NEW_H
 
 #include <TINYSTL/stddef.h>
 
 namespace tinystl {
 
-	struct allocator
-	{
-		static void* allocate(size_t bytes)
-		{
-			return operator new(bytes);
-		}
+	struct placeholder {};
+}
 
-		static void deallocate(void* ptr, size_t /*bytes*/)
-		{
-			operator delete(ptr);
-		}
-	};
+inline void* operator new(size_t, tinystl::placeholder, void* ptr)
+{
+	return ptr;
 }
 
 #endif

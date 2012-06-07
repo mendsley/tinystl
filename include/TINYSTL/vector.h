@@ -27,9 +27,9 @@
 #ifndef TINYSTL_VECTOR_H
 #define TINYSTL_VECTOR_H
 
-#include <new>
-#include <stddef.h>
 #include <TINYSTL/allocator.h>
+#include <TINYSTL/new.h>
+#include <TINYSTL/stddef.h>
 
 namespace tinystl {
 
@@ -139,7 +139,7 @@ namespace tinystl {
 		reserve(size);
 
 		for (pointer it = m_last, end = m_first + size; it < end; ++it)
-			new(it) T();
+			new(placeholder(), it) T();
 		for (pointer it = m_first + size, end = m_last; it < end; ++it)
 			it->~T();
 
@@ -157,7 +157,7 @@ namespace tinystl {
 
 		T* newfirst = (T*)Alloc::allocate(sizeof(T) * capacity);
 		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit)
-			new(newit) T(*it);
+			new(placeholder(), newit) T(*it);
 		for (pointer it = m_first, end = m_last; it != end; ++it)
 			it->~T();
 

@@ -47,6 +47,8 @@ namespace tinystl {
 
 		void append(const char* first, const char* last);
 
+		void swap(string& other);
+
 	private:
 		vector<char> m_buffer;
 	};
@@ -98,6 +100,11 @@ namespace tinystl {
 		m_buffer.pop_back();
 		m_buffer.append(first, last);
 		m_buffer.push_back(0);
+	}
+
+	inline void string::swap(string& other)
+	{
+		m_buffer.swap(other.m_buffer);
 	}
 
 	inline bool operator==(const string& lhs, const string& rhs)

@@ -62,9 +62,9 @@ namespace tinystl {
 	private:
 		typedef T* pointer;
 
-		T* m_first;
-		T* m_last;
-		T* m_capacity;
+		pointer m_first;
+		pointer m_last;
+		pointer m_capacity;
 	};
 
 	template<typename T, typename Alloc>
@@ -89,9 +89,7 @@ namespace tinystl {
 	vector<T, Alloc>::~vector()
 	{
 		for (pointer it = m_first, end = m_last; it != end; ++it)
-		{
 			it->~T();
-		}
 
 		Alloc::deallocate(m_first, (size_t)((char*)m_capacity - (char*)m_first));
 	}
@@ -143,7 +141,7 @@ namespace tinystl {
 		for (pointer it = m_first + size, end = m_last; it < end; ++it)
 			it->~T();
 
-		m_last = m_first + size;
+		m_last += size;
 	}
 
 	template<typename T, typename Alloc>
@@ -155,7 +153,7 @@ namespace tinystl {
 		const size_t size = (size_t)(m_last - m_first);
 		const size_t current = (size_t)(m_capacity - m_first);
 
-		T* newfirst = (T*)Alloc::allocate(sizeof(T) * capacity);
+		pointer newfirst = (T*)Alloc::allocate(sizeof(T) * capacity);
 		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit)
 			new(placeholder(), newit) T(*it);
 		for (pointer it = m_first, end = m_last; it != end; ++it)
@@ -185,15 +183,12 @@ namespace tinystl {
 	template<typename T, typename Alloc>
 	void vector<T, Alloc>::append(const T* first, const T* last)
 	{
-		const size_t count = (size_t)(last - first);
-		const size_t newsize = size() + count;
+		const size_t newsize = (size_t)((m_last - m_first) + (last - first));
 		if (m_first + newsize > m_capacity)
 			reserve((newsize * 3) / 2);
 
-		for (pointer it = m_last, end = m_last + count; it != end; ++it, ++first)
-			new(it) T(*first);
-
-		m_last += count;
+		for (; first != last; ++m_last, ++first)
+			new(m_last) T(*first);
 	}
 
 	template<typename T, typename Alloc>
@@ -203,7 +198,6 @@ namespace tinystl {
 		m_first = other.m_first, m_last = other.m_last, m_capacity = other.m_capacity;
 		other.m_first = tfirst, other.m_last = tlast, other.m_capacity = tcapacity;
 	}
-
 }
 
 #endif 

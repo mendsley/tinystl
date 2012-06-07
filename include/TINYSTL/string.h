@@ -57,29 +57,32 @@ namespace tinystl {
 		pointer m_first;
 		pointer m_last;
 		pointer m_capacity;
+
+		static const size_t c_nbuffer = 12;
+		char m_buffer[12];
 	};
 
 	inline string::string()
-		: m_first(0)
-		, m_last(0)
-		, m_capacity(0)
+		: m_first(m_buffer)
+		, m_last(m_buffer)
+		, m_capacity(m_buffer + c_nbuffer)
 	{
 		resize(0);
 	}
 
 	inline string::string(const string& other)
-		: m_first(0)
-		, m_last(0)
-		, m_capacity(0)
+		: m_first(m_buffer)
+		, m_last(m_buffer)
+		, m_capacity(m_buffer + c_nbuffer)
 	{
 		reserve(other.size());
 		append(other.m_first, other.m_last);
 	}
 
 	inline string::string(const char* sz)
-		: m_first(0)
-		, m_last(0)
-		, m_capacity(0)
+		: m_first(m_buffer)
+		, m_last(m_buffer)
+		, m_capacity(m_buffer + c_nbuffer)
 	{
 		size_t len = 0;
 		for (const char* it = sz; *it; ++it)
@@ -90,9 +93,9 @@ namespace tinystl {
 	}
 
 	inline string::string(const char* sz, size_t len)
-		: m_first(0)
-		, m_last(0)
-		, m_capacity(0)
+		: m_first(m_buffer)
+		, m_last(m_buffer)
+		, m_capacity(m_buffer + c_nbuffer)
 	{
 		reserve(len);
 		append(sz, sz + len);
@@ -100,7 +103,8 @@ namespace tinystl {
 
 	inline string::~string()
 	{
-		delete[] m_first;
+		if (m_first != m_buffer)
+			delete[] m_first;
 	}
 
 	inline string& string::operator=(const string& other)
@@ -130,7 +134,8 @@ namespace tinystl {
 		pointer newfirst = new char[capacity + 1];
 		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit)
 			*newit = *it;
-		delete[] m_first;
+		if (m_first != m_buffer)
+			delete[] m_first;
 
 		m_first = newfirst;
 		m_last = newfirst + size;
@@ -162,6 +167,36 @@ namespace tinystl {
 		const pointer tfirst = m_first, tlast = m_last, tcapacity = m_capacity;
 		m_first = other.m_first, m_last = other.m_last, m_capacity = other.m_capacity;
 		other.m_first = tfirst, other.m_last = tlast, other.m_capacity = tcapacity;
+
+		char tbuffer[c_nbuffer];
+
+		if (m_first == other.m_buffer)
+		{
+			for  (pointer it = other.m_buffer, end = m_last, out = tbuffer; it != end; ++it, ++out)
+				*out = *it;
+		}
+
+		if (other.m_first == m_buffer)
+		{
+			other.m_last = other.m_last - other.m_first + other.m_buffer;
+			other.m_first = other.m_buffer;
+			other.m_capacity = other.m_buffer + c_nbuffer;
+
+			for (pointer it = other.m_first, end = other.m_last, in = m_buffer; it != end; ++it, ++in)
+				*it = *in;
+			*other.m_last = 0;
+		}
+
+		if (m_first == other.m_buffer)
+		{
+			m_last = m_last - m_first + m_buffer;
+			m_first = m_buffer;
+			m_capacity = m_buffer + c_nbuffer;
+
+			for (pointer it = m_first, end = m_last, in = tbuffer; it != end; ++it, ++in)
+				*it = *in;
+			*m_last = 0;
+		}
 	}
 
 	inline bool operator==(const string& lhs, const string& rhs)

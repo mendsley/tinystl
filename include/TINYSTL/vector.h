@@ -141,12 +141,23 @@ namespace tinystl {
 		insert(m_last, first, last);
 	}
 
-	template<typename T, typename Alloc>
-	vector<T, Alloc>::~vector()
+	template<typename T>
+	static inline void destroy_range(T* first, T* last)
 	{
-		for (pointer it = m_first, end = m_last; it != end; ++it)
-			it->~T();
+		for (; first < last; ++first)
+			first->~T();
+	}
 
+	template<typename T>
+	static inline void destroy_range<>(T** first, T** last)
+	{
+	}
+
+
+	template<typename T, typename Alloc>
+	inline vector<T, Alloc>::~vector()
+	{
+		destroy_range(m_first, m_last);
 		Alloc::static_deallocate(m_first, (size_t)((char*)m_capacity - (char*)m_first));
 	}
 
@@ -225,8 +236,7 @@ namespace tinystl {
 
 		for (pointer it = m_last, end = m_first + size; it < end; ++it)
 			new(placeholder(), it) T(value);
-		for (pointer it = m_first + size, end = m_last; it < end; ++it)
-			it->~T();
+		destroy_range(m_first + size, m_last);
 
 		m_last = m_first + size;
 	}
@@ -234,9 +244,7 @@ namespace tinystl {
 	template<typename T, typename Alloc>
 	void vector<T, Alloc>::clear()
 	{
-		for (pointer it = m_first, end = m_last; it != end; ++it)
-			it->~T();
-
+		destroy_range(m_first, m_last);
 		m_last = m_first;
 	}
 
@@ -252,8 +260,7 @@ namespace tinystl {
 		pointer newfirst = (T*)Alloc::static_allocate(sizeof(T) * capacity);
 		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit)
 			new(placeholder(), newit) T(*it);
-		for (pointer it = m_first, end = m_last; it != end; ++it)
-			it->~T();
+		destroy_range(m_first, m_last);
 
 		Alloc::static_deallocate(m_first, sizeof(T) * current);
 
@@ -274,7 +281,7 @@ namespace tinystl {
 		if (m_last != m_first)
 		{
 			--m_last;
-			m_last->~T();
+			destroy_range(m_last, m_last + 1);
 		}
 	}
 
@@ -328,7 +335,7 @@ namespace tinystl {
 		for (pointer it = m_last, end = where, dest = m_last + (size_t)(last - first); it != end; --it, --dest)
 		{
 			new(placeholder(), dest - 1) T(*(it - 1));
-			(it - 1)->~T();
+			destroy_range(it - 1, it);
 		}
 
 		for ( ; first != last; ++first, ++m_last, ++where)
@@ -346,9 +353,9 @@ namespace tinystl {
 	{
 		for (pointer dest = first, it = last, end = m_last; it != end; ++it, ++dest)
 		{
-			dest->~T();
+			destroy_range(dest, dest + 1);
 			new(placeholder(), dest) T(*it);
-			it->~T();
+			destroy_range(it, it + 1);
 		}
 
 		m_last -= (last - first);

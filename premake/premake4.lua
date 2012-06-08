@@ -1,5 +1,8 @@
 solution "tinystl"
 
+	local ROOT_DIR = path.join(path.getdirectory(_SCRIPT), "..") .. "/"
+	local THIRDPARTY_DIR = ROOT_DIR .. "3rdparty/"
+
 	platforms {
 		"x32",
 		"x64",
@@ -17,7 +20,6 @@ solution "tinystl"
 		"NoMinimalRebuild",
 		"NoPCH",
 		"NoRTTI",
-		"NoExceptions",
 		"NoEditAndContinue",
 		"ExtraWarnings",
 		"FatalWarnings",
@@ -28,13 +30,28 @@ solution "tinystl"
 		"../include/"
 	}
 
-	location "../.build/projects/"
-	objdir "../.build/obj/"
-	targetdir "../bin/"
+	location (ROOT_DIR .. ".build/projects")
+	objdir (ROOT_DIR .. ".build/obj/")
+	targetdir (ROOT_DIR .. "bin/")
 
-project "test_vector"
+dofile "unittest++.lua"
+
+project "test_tinystl"
 	kind "ConsoleApp"
 
 	files {
-		"../test/**.cpp"
+		ROOT_DIR .. "test/**.cpp"
+	}
+
+	includedirs {
+		ROOT_DIR .. "include/",
+		THIRDPARTY_DIR .. "UnitTest++/src/",
+	}
+
+	links {
+		"UnitTest++"
+	}
+
+	postbuildcommands {
+		ROOT_DIR .. "bin/test_tinystl"
 	}

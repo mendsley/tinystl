@@ -39,25 +39,51 @@ namespace tinystl {
 	public:
 		vector();
 		vector(const vector& other);
+		vector(size_t size);
+		vector(size_t size, const T& value);
+		vector(const T* first, const T* last);
 		~vector();
 
 		vector& operator=(const vector& other);
 
+		void assign(const T* first, const T* last);
+
 		const T* data() const;
 		T* data();
 		size_t size() const;
+		bool empty() const;
 
 		T& operator[](size_t idx);
 		const T& operator[](size_t idx) const;
 
+		const T& back() const;
+		T& back();
+
 		void resize(size_t size);
+		void resize(size_t size, const T& value);
+		void clear();
 		void reserve(size_t capacity);
 
 		void push_back(const T& t);
 		void pop_back();
-		void append(const T* first, const T* last);
 
 		void swap(vector& other);
+
+		typedef T value_type;
+
+		typedef T* iterator;
+		iterator begin();
+		iterator end();
+
+		typedef const T* const_iterator;
+		const_iterator begin() const;
+		const_iterator end() const;
+
+		void insert(iterator where, const T& value);
+		void insert(iterator where, const T* first, const T* last);
+
+		iterator erase(iterator where);
+		iterator erase(iterator first, iterator last);
 
 	private:
 		typedef T* pointer;
@@ -82,7 +108,37 @@ namespace tinystl {
 		, m_capacity(0)
 	{
 		reserve(other.size());
-		append(other.m_first, other.m_last);
+		insert(m_last, other.m_first, other.m_last);
+	}
+
+	template<typename T, typename Alloc>
+	vector<T, Alloc>::vector(size_t size)
+		: m_first(0)
+		, m_last(0)
+		, m_capacity(0)
+	{
+		resize(size);
+	}
+
+	template<typename T, typename Alloc>
+	vector<T, Alloc>::vector(size_t size, const T& value)
+		: m_first(0)
+		, m_last(0)
+		, m_capacity(0)
+	{
+		reserve(size);
+		for (pointer it = m_last, end = m_last + size; it != end; ++it)
+			new(placeholder(), it) T(value);
+		m_last += size;
+	}
+
+	template<typename T, typename Alloc>
+	vector<T, Alloc>::vector(const T* first, const T* last)
+		: m_first(0)
+		, m_last(0)
+		, m_capacity(0)
+	{
+		insert(m_last, first, last);
 	}
 
 	template<typename T, typename Alloc>
@@ -99,6 +155,13 @@ namespace tinystl {
 	{
 		vector(other).swap(*this);
 		return *this;
+	}
+
+	template<typename T, typename Alloc>
+	void vector<T, Alloc>::assign(const T* first, const T* last)
+	{
+		clear();
+		insert(m_last, first, last);
 	}
 
 	template<typename T, typename Alloc>
@@ -120,6 +183,12 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
+	bool vector<T, Alloc>::empty() const
+	{
+		return m_last == m_first;
+	}
+
+	template<typename T, typename Alloc>
 	T& vector<T, Alloc>::operator[](size_t idx)
 	{
 		return m_first[idx];
@@ -132,16 +201,43 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
+	const T& vector<T, Alloc>::back() const
+	{
+		return m_last[-1];
+	}
+
+	template<typename T, typename Alloc>
+	T& vector<T, Alloc>::back()
+	{
+		return m_last[-1];
+	}
+
+	template<typename T, typename Alloc>
 	void vector<T, Alloc>::resize(size_t size)
+	{
+		resize(size, T());
+	}
+
+	template<typename T, typename Alloc>
+	void vector<T, Alloc>::resize(size_t size, const T& value)
 	{
 		reserve(size);
 
 		for (pointer it = m_last, end = m_first + size; it < end; ++it)
-			new(placeholder(), it) T();
+			new(placeholder(), it) T(value);
 		for (pointer it = m_first + size, end = m_last; it < end; ++it)
 			it->~T();
 
-		m_last += size;
+		m_last = m_first + size;
+	}
+
+	template<typename T, typename Alloc>
+	void vector<T, Alloc>::clear()
+	{
+		for (pointer it = m_first, end = m_last; it != end; ++it)
+			it->~T();
+
+		m_last = m_first;
 	}
 
 	template<typename T, typename Alloc>
@@ -159,7 +255,7 @@ namespace tinystl {
 		for (pointer it = m_first, end = m_last; it != end; ++it)
 			it->~T();
 
-		Alloc::deallocate(m_first, current);
+		Alloc::deallocate(m_first, sizeof(T) * current);
 
 		m_first = newfirst;
 		m_last = newfirst + size;
@@ -169,26 +265,17 @@ namespace tinystl {
 	template<typename T, typename Alloc>
 	void vector<T, Alloc>::push_back(const T& t)
 	{
-		append(&t, &t + 1);
+		insert(m_last, &t, &t + 1);
 	}
 
 	template<typename T, typename Alloc>
 	void vector<T, Alloc>::pop_back()
 	{
-		const size_t sz = size();
-		if (sz)
-			resize(sz - 1);
-	}
-
-	template<typename T, typename Alloc>
-	void vector<T, Alloc>::append(const T* first, const T* last)
-	{
-		const size_t newsize = (size_t)((m_last - m_first) + (last - first));
-		if (m_first + newsize > m_capacity)
-			reserve((newsize * 3) / 2);
-
-		for (; first != last; ++m_last, ++first)
-			new(m_last) T(*first);
+		if (m_last != m_first)
+		{
+			--m_last;
+			m_last->~T();
+		}
 	}
 
 	template<typename T, typename Alloc>
@@ -197,6 +284,75 @@ namespace tinystl {
 		const pointer tfirst = m_first, tlast = m_last, tcapacity = m_capacity;
 		m_first = other.m_first, m_last = other.m_last, m_capacity = other.m_capacity;
 		other.m_first = tfirst, other.m_last = tlast, other.m_capacity = tcapacity;
+	}
+
+	template<typename T, typename Alloc>
+	typename vector<T, Alloc>::iterator vector<T,Alloc>::begin()
+	{
+		return m_first;
+	}
+
+	template<typename T, typename Alloc>
+	typename vector<T, Alloc>::iterator vector<T,Alloc>::end()
+	{
+		return m_last;
+	}
+
+	template<typename T, typename Alloc>
+	typename vector<T, Alloc>::const_iterator vector<T,Alloc>::begin() const
+	{
+		return m_first;
+	}
+
+	template<typename T, typename Alloc>
+	typename vector<T, Alloc>::const_iterator vector<T,Alloc>::end() const
+	{
+		return m_last;
+	}
+
+	template<typename T, typename Alloc>
+	void vector<T, Alloc>::insert(iterator where, const T& value)
+	{
+		insert(where, &value, &value + 1);
+	}
+
+	template<typename T, typename Alloc>
+	void vector<T, Alloc>::insert(iterator where, const T* first, const T* last)
+	{
+		const size_t offset = (size_t)(where - m_first);
+		const size_t newsize = (size_t)((m_last - m_first) + (last - first));
+		if (m_first + newsize > m_capacity)
+			reserve((newsize * 3) / 2);
+
+		where = m_first + offset;
+		for (pointer it = m_last, end = where, dest = m_last + (size_t)(last - first); it != end; --it, --dest)
+		{
+			new(placeholder(), dest - 1) T(*(it - 1));
+			(it - 1)->~T();
+		}
+
+		for ( ; first != last; ++first, ++m_last, ++where)
+			new(where) T(*first);
+	}
+
+	template<typename T, typename Alloc>
+	typename vector<T, Alloc>::iterator vector<T, Alloc>::erase(iterator where)
+	{
+		return erase(where, where + 1);
+	}
+
+	template<typename T, typename Alloc>
+	typename vector<T, Alloc>::iterator vector<T, Alloc>::erase(iterator first, iterator last)
+	{
+		for (pointer dest = first, it = last, end = m_last; it != end; ++it, ++dest)
+		{
+			dest->~T();
+			new(placeholder(), dest) T(*it);
+			it->~T();
+		}
+
+		m_last -= (last - first);
+		return first;
 	}
 }
 

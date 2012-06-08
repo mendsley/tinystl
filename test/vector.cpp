@@ -24,22 +24,203 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
 #include <TINYSTL/vector.h>
-#include <TINYSTL/allocator_stl.h>
-#include <memory>
+#include <UnitTest++.h>
+#include <algorithm>
 
-int main()
+TEST(vector_constructor)
 {
-	tinystl::vector<int, tinystl::allocator_stl<std::allocator<int> > > v;
-	v.reserve(200);
-	for (int ii = 0; ii < 200; ++ii)
-		v.push_back(ii);
+	typedef tinystl::vector<int> vector;
 
-	tinystl::vector<int, tinystl::allocator_stl< std::allocator<int> > > o = v;
-	o.resize(o.size() / 2);
-	v = o;
-	o.resize(0);
+	{
+		vector v;
+		CHECK( v.empty() );
+		CHECK( v.size() == 0 );
+	}
+	{
+		const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+		vector v(array, array + 10);
 
-	printf( "Hello %d\n", (int)v.size() );
+		CHECK( v.size() == 10 );
+		CHECK( std::equal(v.begin(), v.end(), array) );
+	}
+	{
+		const int value = 127;
+		const size_t count = 24;
+		vector v(count, value);
+
+		CHECK( v.size() == count );
+
+		vector::iterator it = v.begin(), end = v.end();
+		for (; it != end; ++it)
+		{
+			CHECK(*it == value);
+		}
+	}
+	{
+		const size_t count = 24;
+		vector v(count);
+
+		CHECK(v.size() == count);
+		vector::iterator it = v.begin(), end = v.end();
+		for (; it != end; ++it)
+		{
+			CHECK(*it == 0);
+		}
+	}
+	{
+		const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+		vector other(array, array + 10);
+		vector v = other;
+
+		CHECK( v.size() == other.size() );
+		CHECK( std::equal(v.begin(), v.end(), other.begin()) );
+	}
+}
+
+TEST(vector_assignment)
+{
+	typedef tinystl::vector<int> vector;
+
+	{
+		const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+		vector other(array, array + 10);
+
+		vector v;
+		v = other;
+
+		CHECK( v.size() == 10 );
+		CHECK( std::equal(v.begin(), v.end(), array) );
+		CHECK( other.size() == 10 );
+		CHECK( std::equal(v.begin(), v.end(), other.begin()) );
+	}
+}
+
+TEST(vector_pushback)
+{
+	tinystl::vector<int> v;
+	v.push_back(42);
+
+	CHECK(v.size() == 1);
+	CHECK(v[0] == 42);
+}
+
+TEST(vector_vector)
+{
+	tinystl::vector< tinystl::vector<int> > v(10, tinystl::vector<int>());
+
+	tinystl::vector< tinystl::vector<int> >::iterator it = v.begin(), end = v.end();
+	for (; it != end; ++it)
+	{
+		CHECK( (*it).empty() );
+		CHECK( (*it).size() == 0 );
+		CHECK( (*it).begin() == (*it).end() );
+	}
+}
+
+TEST(vector_swap)
+{
+	tinystl::vector<int> v1;
+	v1.push_back(12);
+	v1.push_back(20);
+
+	tinystl::vector<int> v2;
+	v2.push_back(54);
+
+	v1.swap(v2);
+
+	CHECK(v1.size() == 1);
+	CHECK(v2.size() == 2);
+	CHECK(v1[0] == 54);
+	CHECK(v2[0] == 12);
+	CHECK(v2[1] == 20);
+}
+
+TEST(vector_popback)
+{
+	tinystl::vector<int> v;
+	v.push_back(12);
+	v.push_back(24);
+
+	CHECK(v.back() == 24);
+	
+	v.pop_back();
+
+	CHECK(v.back() == 12);
+	CHECK(v.size() == 1);
+}
+
+TEST(vector_assign)
+{
+	tinystl::vector<int> v;
+
+	CHECK(v.size() == 0);
+
+	const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	v.assign(array, array + 10);
+	CHECK(v.size() == 10);
+	CHECK( std::equal(v.begin(), v.end(), array) );
+}
+
+TEST(vector_erase)
+{
+	const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	tinystl::vector<int> v(array, array + 10);
+
+	tinystl::vector<int>::iterator it = v.erase(v.begin());
+	CHECK(*it == 2);
+	CHECK(v.size() == 9);
+	CHECK( std::equal(v.begin(), v.end(), array + 1) );
+
+	it = v.erase(v.end() - 1);
+	CHECK(it == v.end());
+	CHECK(v.size() == 8);
+	CHECK( std::equal(v.begin(), v.end(), array + 1) );
+
+	v.erase(v.begin() + 1, v.end() - 1);
+	CHECK(v.size() == 2);
+	CHECK(v[0] == 2);
+	CHECK(v[1] == 9);
+}
+
+TEST(vector_insert)
+{
+	const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	tinystl::vector<int> v(array, array + 10);
+
+	v.insert(v.begin(), 0);
+	CHECK(v.size() == 11);
+	CHECK(v[0] == 0);
+	CHECK( std::equal(v.begin() + 1, v.end(), array) );
+
+	v.insert(v.end(), 11);
+	CHECK(v.size() == 12);
+	CHECK(v[0] == 0);
+	CHECK( std::equal(array, array + 10, v.begin() + 1) );
+	CHECK(v.back() == 11);
+
+	const int array2[3] = {11, 12, 13};
+	const int finalarray[] = {0, 1, 2, 3, 11, 12, 13, 4, 5, 6, 7, 8, 9, 10, 11};
+	v.insert(v.begin() + 4, array2, array2 + 3);
+	CHECK( v.size() == 15 );
+	CHECK( std::equal(v.begin(), v.end(), finalarray) );
+}
+
+TEST(vector_iterator)
+{
+	const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+	tinystl::vector<int> v(array, array + 10);
+	const tinystl::vector<int>& cv = v;
+
+	CHECK(v.data() == &*v.begin());
+	CHECK(v.data() == &v[0]);
+	CHECK(v.data() + v.size() == &*v.end());
+	CHECK(v.begin() == cv.begin());
+	CHECK(v.end() == cv.end());
+	CHECK(v.data() == cv.data());
+
+	tinystl::vector<int> w = v;
+	CHECK(v.begin() != w.begin());
+	CHECK(v.end() != w.end());
 }

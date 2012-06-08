@@ -27,7 +27,14 @@
 #ifndef TINYSTL_STDDEF_H
 #define TINYSTL_STDDEF_H
 
-#include <stddef.h>
-
+#if defined(_WIN64)
+	typedef long long unsigned int size_t;
+#elif defined(_WIN32)
+	typedef long unsigned int size_t;
+#elif defined (__linux__)
+	typedef long unsigned int size_t;
+#else
+#	include <stddef.h>
 #endif
 
+#endif

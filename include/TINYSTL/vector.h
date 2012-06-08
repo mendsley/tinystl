@@ -147,7 +147,7 @@ namespace tinystl {
 		for (pointer it = m_first, end = m_last; it != end; ++it)
 			it->~T();
 
-		Alloc::deallocate(m_first, (size_t)((char*)m_capacity - (char*)m_first));
+		Alloc::static_deallocate(m_first, (size_t)((char*)m_capacity - (char*)m_first));
 	}
 
 	template<typename T, typename Alloc>
@@ -249,13 +249,13 @@ namespace tinystl {
 		const size_t size = (size_t)(m_last - m_first);
 		const size_t current = (size_t)(m_capacity - m_first);
 
-		pointer newfirst = (T*)Alloc::allocate(sizeof(T) * capacity);
+		pointer newfirst = (T*)Alloc::static_allocate(sizeof(T) * capacity);
 		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit)
 			new(placeholder(), newit) T(*it);
 		for (pointer it = m_first, end = m_last; it != end; ++it)
 			it->~T();
 
-		Alloc::deallocate(m_first, sizeof(T) * current);
+		Alloc::static_deallocate(m_first, sizeof(T) * current);
 
 		m_first = newfirst;
 		m_last = newfirst + size;
@@ -332,7 +332,7 @@ namespace tinystl {
 		}
 
 		for ( ; first != last; ++first, ++m_last, ++where)
-			new(where) T(*first);
+			new(placeholder(), where) T(*first);
 	}
 
 	template<typename T, typename Alloc>

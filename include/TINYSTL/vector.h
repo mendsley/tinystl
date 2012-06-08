@@ -94,7 +94,7 @@ namespace tinystl {
 	};
 
 	template<typename T, typename Alloc>
-	vector<T, Alloc>::vector()
+	inline vector<T, Alloc>::vector()
 		: m_first(0)
 		, m_last(0)
 		, m_capacity(0)
@@ -102,7 +102,7 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	vector<T, Alloc>::vector(const vector& other)
+	inline vector<T, Alloc>::vector(const vector& other)
 		: m_first(0)
 		, m_last(0)
 		, m_capacity(0)
@@ -112,7 +112,7 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	vector<T, Alloc>::vector(size_t size)
+	inline vector<T, Alloc>::vector(size_t size)
 		: m_first(0)
 		, m_last(0)
 		, m_capacity(0)
@@ -121,7 +121,7 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	vector<T, Alloc>::vector(size_t size, const T& value)
+	inline vector<T, Alloc>::vector(size_t size, const T& value)
 		: m_first(0)
 		, m_last(0)
 		, m_capacity(0)
@@ -133,7 +133,7 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	vector<T, Alloc>::vector(const T* first, const T* last)
+	inline vector<T, Alloc>::vector(const T* first, const T* last)
 		: m_first(0)
 		, m_last(0)
 		, m_capacity(0)
@@ -162,75 +162,75 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	vector<T, Alloc>& vector<T, Alloc>::operator=(const vector& other)
+	inline vector<T, Alloc>& vector<T, Alloc>::operator=(const vector& other)
 	{
 		vector(other).swap(*this);
 		return *this;
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::assign(const T* first, const T* last)
+	inline void vector<T, Alloc>::assign(const T* first, const T* last)
 	{
 		clear();
 		insert(m_last, first, last);
 	}
 
 	template<typename T, typename Alloc>
-	const T* vector<T, Alloc>::data() const
+	inline const T* vector<T, Alloc>::data() const
 	{
 		return m_first;
 	}
 
 	template<typename T, typename Alloc>
-	T* vector<T, Alloc>::data()
+	inline T* vector<T, Alloc>::data()
 	{
 		return m_first;
 	}
 
 	template<typename T, typename Alloc>
-	size_t vector<T, Alloc>::size() const
+	inline size_t vector<T, Alloc>::size() const
 	{
 		return (size_t)(m_last - m_first);
 	}
 
 	template<typename T, typename Alloc>
-	bool vector<T, Alloc>::empty() const
+	inline bool vector<T, Alloc>::empty() const
 	{
 		return m_last == m_first;
 	}
 
 	template<typename T, typename Alloc>
-	T& vector<T, Alloc>::operator[](size_t idx)
+	inline T& vector<T, Alloc>::operator[](size_t idx)
 	{
 		return m_first[idx];
 	}
 
 	template<typename T, typename Alloc>
-	const T& vector<T, Alloc>::operator[](size_t idx) const
+	inline const T& vector<T, Alloc>::operator[](size_t idx) const
 	{
 		return m_first[idx];
 	}
 
 	template<typename T, typename Alloc>
-	const T& vector<T, Alloc>::back() const
+	inline const T& vector<T, Alloc>::back() const
 	{
 		return m_last[-1];
 	}
 
 	template<typename T, typename Alloc>
-	T& vector<T, Alloc>::back()
+	inline T& vector<T, Alloc>::back()
 	{
 		return m_last[-1];
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::resize(size_t size)
+	inline void vector<T, Alloc>::resize(size_t size)
 	{
 		resize(size, T());
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::resize(size_t size, const T& value)
+	inline void vector<T, Alloc>::resize(size_t size, const T& value)
 	{
 		reserve(size);
 
@@ -242,14 +242,14 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::clear()
+	inline void vector<T, Alloc>::clear()
 	{
 		destroy_range(m_first, m_last);
 		m_last = m_first;
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::reserve(size_t capacity)
+	inline void vector<T, Alloc>::reserve(size_t capacity)
 	{
 		if (m_first + capacity <= m_capacity)
 			return;
@@ -270,13 +270,13 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::push_back(const T& t)
+	inline void vector<T, Alloc>::push_back(const T& t)
 	{
 		insert(m_last, &t, &t + 1);
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::pop_back()
+	inline void vector<T, Alloc>::pop_back()
 	{
 		if (m_last != m_first)
 		{
@@ -286,7 +286,7 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::swap(vector& other)
+	inline void vector<T, Alloc>::swap(vector& other)
 	{
 		const pointer tfirst = m_first, tlast = m_last, tcapacity = m_capacity;
 		m_first = other.m_first, m_last = other.m_last, m_capacity = other.m_capacity;
@@ -294,37 +294,37 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	typename vector<T, Alloc>::iterator vector<T,Alloc>::begin()
+	inline typename vector<T, Alloc>::iterator vector<T,Alloc>::begin()
 	{
 		return m_first;
 	}
 
 	template<typename T, typename Alloc>
-	typename vector<T, Alloc>::iterator vector<T,Alloc>::end()
+	inline typename vector<T, Alloc>::iterator vector<T,Alloc>::end()
 	{
 		return m_last;
 	}
 
 	template<typename T, typename Alloc>
-	typename vector<T, Alloc>::const_iterator vector<T,Alloc>::begin() const
+	inline typename vector<T, Alloc>::const_iterator vector<T,Alloc>::begin() const
 	{
 		return m_first;
 	}
 
 	template<typename T, typename Alloc>
-	typename vector<T, Alloc>::const_iterator vector<T,Alloc>::end() const
+	inline typename vector<T, Alloc>::const_iterator vector<T,Alloc>::end() const
 	{
 		return m_last;
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::insert(iterator where, const T& value)
+	inline void vector<T, Alloc>::insert(iterator where, const T& value)
 	{
 		insert(where, &value, &value + 1);
 	}
 
 	template<typename T, typename Alloc>
-	void vector<T, Alloc>::insert(iterator where, const T* first, const T* last)
+	inline void vector<T, Alloc>::insert(iterator where, const T* first, const T* last)
 	{
 		const size_t offset = (size_t)(where - m_first);
 		const size_t newsize = (size_t)((m_last - m_first) + (last - first));
@@ -343,13 +343,13 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	typename vector<T, Alloc>::iterator vector<T, Alloc>::erase(iterator where)
+	inline typename vector<T, Alloc>::iterator vector<T, Alloc>::erase(iterator where)
 	{
 		return erase(where, where + 1);
 	}
 
 	template<typename T, typename Alloc>
-	typename vector<T, Alloc>::iterator vector<T, Alloc>::erase(iterator first, iterator last)
+	inline typename vector<T, Alloc>::iterator vector<T, Alloc>::erase(iterator first, iterator last)
 	{
 		for (pointer dest = first, it = last, end = m_last; it != end; ++it, ++dest)
 		{

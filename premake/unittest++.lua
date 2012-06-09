@@ -17,4 +17,10 @@ project "UnitTest++"
 			"../3rdparty/UnitTest++/src/Posix/**.h",
 		}
 
+	configuration { "windows" }
+		files {
+			"../3rdparty/UnitTest++/src/Win32/**.cpp",
+			"../3rdparty/UnitTest++/src/Win32/**.h",
+		}
+
 	configuration {}

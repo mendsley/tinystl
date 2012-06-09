@@ -30,7 +30,7 @@
 #if defined(_WIN64)
 	typedef long long unsigned int size_t;
 #elif defined(_WIN32)
-	typedef long unsigned int size_t;
+	typedef unsigned int size_t;
 #elif defined (__linux__)
 	typedef long unsigned int size_t;
 #else

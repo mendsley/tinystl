@@ -18,6 +18,9 @@ project "UnitTest++"
 		}
 
 	configuration { "windows" }
+		defines {
+			"_CRT_SECURE_NO_WARNINGS",
+		}
 		files {
 			"../3rdparty/UnitTest++/src/Win32/**.cpp",
 			"../3rdparty/UnitTest++/src/Win32/**.h",

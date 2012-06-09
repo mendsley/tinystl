@@ -55,3 +55,8 @@ project "test_tinystl"
 	postbuildcommands {
 		ROOT_DIR .. "bin/test_tinystl"
 	}
+
+	configuration { "windows" }
+		defines {
+			"_SCL_SECURE_NO_WARNINGS",
+		}

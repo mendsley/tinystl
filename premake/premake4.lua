@@ -40,7 +40,8 @@ project "test_tinystl"
 	kind "ConsoleApp"
 
 	files {
-		ROOT_DIR .. "test/**.cpp"
+		ROOT_DIR .. "test/**.cpp",
+		ROOT_DIR .. "include/**.h",
 	}
 
 	includedirs {

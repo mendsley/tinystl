@@ -37,6 +37,28 @@
 
 namespace tinystl {
 	template<typename T, bool pod = TINYSTL_TRY_POD_OPTIMIZATION(T)> struct pod_traits {};
+
+	template<typename T, T t> struct swap_holder;
+
+	template<typename T>
+	static inline void swap_impl(T& a, T& b, ...)
+	{
+		T t = b;
+		b = a;
+		a = t;
+	}
+
+	template<typename T>
+	static inline void swap_impl(T& a, T& b, T*, swap_holder<void (T::*)(T&), &T::swap>* = 0)
+	{
+		a.swap(b);
+	}
+
+	template<typename T>
+	static inline void swap(T& a, T&b)
+	{
+		swap_impl(a, b, (T*)0);
+	}
 }
 
 #endif

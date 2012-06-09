@@ -164,7 +164,7 @@ namespace tinystl {
 	{
 		buffer_reserve(b, size);
 
-		buffer_fill_urange(b->last, b->last + size, value);
+		buffer_fill_urange(b->last, b->first + size, value);
 		buffer_destroy_range(b->first + size, b->last);
 		b->last = b->first + size;
 	}

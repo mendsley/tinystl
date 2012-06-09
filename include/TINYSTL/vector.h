@@ -115,12 +115,7 @@ namespace tinystl {
 	inline vector<T, Alloc>::vector(size_t size, const T& value)
 	{
 		buffer_init(&m_buffer);
-		buffer_reserve(&m_buffer, size);
-
-		typedef T* pointer;
-		for (pointer it = m_buffer.last, end = m_buffer.last + size; it != end; ++it)
-			new(placeholder(), it) T(value);
-		m_buffer.last += size;
+		buffer_resize(&m_buffer, size, value);
 	}
 
 	template<typename T, typename Alloc>

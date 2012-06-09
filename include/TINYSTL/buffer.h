@@ -29,6 +29,7 @@
 
 #include <TINYSTL/allocator.h>
 #include <TINYSTL/new.h>
+#include <TINYSTL/traits.h>
 
 namespace tinystl {
 
@@ -41,15 +42,21 @@ namespace tinystl {
 	};
 
 	template<typename T>
-	static inline void buffer_destroy_range(T* first, T* last)
+	static inline void buffer_destroy_range_traits(T* first, T* last, pod_traits<T, false>)
 	{
 		for (; first < last; ++first)
 			first->~T();
 	}
 
 	template<typename T>
-	static inline void buffer_destroy_range(T**, T**)
+	static inline void buffer_destroy_range_traits(T*, T*, pod_traits<T, true>)
 	{
+	}
+
+	template<typename T>
+	static inline void buffer_destroy_range(T* first, T* last)
+	{
+		buffer_destroy_range_traits(first, last, pod_traits<T>());
 	}
 
 	template<typename T, typename Alloc>

@@ -149,7 +149,7 @@ namespace tinystl {
 	}
 
 	template<typename T>
-	static inline void destroy_range<>(T** first, T** last)
+	static inline void destroy_range(T** first, T** last)
 	{
 	}
 

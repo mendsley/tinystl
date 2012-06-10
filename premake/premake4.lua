@@ -60,4 +60,5 @@ project "test_tinystl"
 	configuration { "windows" }
 		defines {
 			"_SCL_SECURE_NO_WARNINGS",
+			"_CRT_NONSTDC_NO_WARNINGS",
 		}

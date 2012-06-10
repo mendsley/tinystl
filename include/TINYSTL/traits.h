@@ -41,23 +41,21 @@ namespace tinystl {
 	template<typename T, T t> struct swap_holder;
 
 	template<typename T>
-	static inline void swap_impl(T& a, T& b, ...)
+	static inline void move_impl(T& a, T& b, ...)
 	{
-		T t = b;
-		b = a;
-		a = t;
+		a = b;
 	}
 
 	template<typename T>
-	static inline void swap_impl(T& a, T& b, T*, swap_holder<void (T::*)(T&), &T::swap>* = 0)
+	static inline void move_impl(T& a, T& b, T*, swap_holder<void (T::*)(T&), &T::swap>* = 0)
 	{
 		a.swap(b);
 	}
 
 	template<typename T>
-	static inline void swap(T& a, T&b)
+	static inline void move(T& a, T&b)
 	{
-		swap_impl(a, b, (T*)0);
+		move_impl(a, b, (T*)0);
 	}
 }
 

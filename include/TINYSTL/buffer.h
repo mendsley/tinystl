@@ -73,7 +73,7 @@ namespace tinystl {
 		for (T* it = first; it != last; ++it, ++dest)
 		{
 			new(placeholder(), dest) T;
-			swap(*dest, *it);
+			move(*dest, *it);
 		}
 		buffer_destroy_range(first, last);
 	}
@@ -92,7 +92,7 @@ namespace tinystl {
 		for (T* it = last; it != first; --it, --dest)
 		{
 			new(placeholder(), dest - 1) T;
-			swap(*(dest - 1), *(it - 1));
+			move(*(dest - 1), *(it - 1));
 			buffer_destroy_range(it - 1, it);
 		}
 	}
@@ -201,7 +201,7 @@ namespace tinystl {
 	{
 		typedef T* pointer;
 		for (pointer it = last, end = b->last, dest = first; it != end; ++it, ++dest)
-			swap(*dest, *it);
+			move(*dest, *it);
 
 		buffer_destroy_range(b->last - (last - first), b->last);
 

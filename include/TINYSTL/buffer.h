@@ -72,8 +72,7 @@ namespace tinystl {
 	{
 		for (T* it = first; it != last; ++it, ++dest)
 		{
-			new(placeholder(), dest) T;
-			move(*dest, *it);
+			move_construct(dest, *it);
 		}
 		buffer_destroy_range(first, last);
 	}
@@ -91,8 +90,7 @@ namespace tinystl {
 		dest += (last - first);
 		for (T* it = last; it != first; --it, --dest)
 		{
-			new(placeholder(), dest - 1) T;
-			move(*(dest - 1), *(it - 1));
+			move_construct(dest - 1, *(it - 1));
 			buffer_destroy_range(it - 1, it);
 		}
 	}

@@ -54,9 +54,50 @@ namespace tinystl {
 	}
 
 	template<typename T>
+	static inline void buffer_fill_urange_traits(T* first, T* last, const T& value, pod_traits<T, false>)
+	{
+		for (; first < last; ++first)
+			new(placeholder(), first) T(value);
+	}
+
+	template<typename T>
+	static inline void buffer_fill_urange_traits(T* first, T* last, const T& value, pod_traits<T, true>)
+	{
+		for (; first < last; ++first)
+			*first = value;
+	}
+
+	template<typename T>
+	static inline void buffer_move_urange_traits(T* dest, T* first, T* last, pod_traits<T, false>)
+	{
+		for (T* it = first; it != last; ++it, ++dest)
+			new(placeholder(), dest) T(*it);
+		buffer_destroy_range(first, last);
+	}
+
+	template<typename T>
+	static inline void buffer_move_urange_traits(T* dest, T* first, T* last, pod_traits<T, true>)
+	{
+		for (; first != last; ++first, ++dest)
+			*dest = *first;
+	}
+
+	template<typename T>
 	static inline void buffer_destroy_range(T* first, T* last)
 	{
 		buffer_destroy_range_traits(first, last, pod_traits<T>());
+	}
+
+	template<typename T>
+	static inline void buffer_move_urange(T* dest, T* first, T* last)
+	{
+		buffer_move_urange_traits(dest, first, last, pod_traits<T>());
+	}
+
+	template<typename T>
+	static inline void buffer_fill_urange(T* first, T* last, const T& value)
+	{
+		buffer_fill_urange_traits(first, last, value, pod_traits<T>());
 	}
 
 	template<typename T, typename Alloc>
@@ -81,10 +122,9 @@ namespace tinystl {
 		typedef T* pointer;
 		const size_t size = (size_t)(b->last - b->first);
 		pointer newfirst = (pointer)Alloc::static_allocate(sizeof(T) * capacity);
-		for (pointer it = b->first, end = b->last, dest = newfirst; it != end; ++it, ++dest)
-			new(placeholder(), dest) T(*it);
+		buffer_move_urange(newfirst, b->first, b->last);
+		Alloc::static_deallocate(b->first, sizeof(T) * capacity);
 
-		buffer_destroy(b);
 		b->first = newfirst;
 		b->last = newfirst + size;
 		b->capacity = newfirst + capacity;
@@ -95,10 +135,7 @@ namespace tinystl {
 	{
 		buffer_reserve(b, size);
 
-		typedef T* pointer;
-		for (pointer it = b->last, end = b->first + size; it < end; ++it)
-			new(placeholder(), it) T(value);
-
+		buffer_fill_urange(b->last, b->last + size, value);
 		buffer_destroy_range(b->first + size, b->last);
 		b->last = b->first + size;
 	}

@@ -71,7 +71,10 @@ namespace tinystl {
 	static inline void buffer_move_urange_traits(T* dest, T* first, T* last, pod_traits<T, false>)
 	{
 		for (T* it = first; it != last; ++it, ++dest)
-			new(placeholder(), dest) T(*it);
+		{
+			new(placeholder(), dest) T;
+			swap(*dest, *it);
+		}
 		buffer_destroy_range(first, last);
 	}
 
@@ -88,7 +91,8 @@ namespace tinystl {
 		dest += (last - first);
 		for (T* it = last; it != first; --it, --dest)
 		{
-			new(placeholder(), dest - 1) T(*(it - 1));
+			new(placeholder(), dest - 1) T;
+			swap(*(dest - 1), *(it - 1));
 			buffer_destroy_range(it - 1, it);
 		}
 	}

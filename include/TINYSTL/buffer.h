@@ -172,11 +172,15 @@ namespace tinystl {
 	template<typename T, typename Alloc>
 	static inline T* buffer_erase(buffer<T, Alloc>* b, T* first, T* last)
 	{
-		buffer_destroy_range(first, last);
-
 		typedef T* pointer;
 		for (pointer it = last, end = b->last, dest = first; it != end; ++it, ++dest)
-			new(placeholder(), dest) T(*it);
+		{
+			dest->~T();
+			new(dest) T(*it);
+		}
+
+		for (pointer it = b->last - (last - first), end = b->last; it != end; ++it)
+			it->~T();
 
 		b->last -= (last - first);
 		return first;

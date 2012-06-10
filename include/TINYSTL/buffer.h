@@ -83,6 +83,25 @@ namespace tinystl {
 	}
 
 	template<typename T>
+	static inline void buffer_bmove_urange_traits(T* dest, T* first, T* last, pod_traits<T, false>)
+	{
+		dest += (last - first);
+		for (T* it = last; it != first; --it, --dest)
+		{
+			new(placeholder(), dest - 1) T(*(it - 1));
+			buffer_destroy_range(it - 1, it);
+		}
+	}
+
+	template<typename T>
+	static inline void buffer_bmove_urange_traits(T* dest, T* first, T* last, pod_traits<T, true>)
+	{
+		dest += (last - first);
+		for (T* it = last; it != first; --it, --dest)
+			*(dest - 1) = *(it - 1);
+	}
+
+	template<typename T>
 	static inline void buffer_destroy_range(T* first, T* last)
 	{
 		buffer_destroy_range_traits(first, last, pod_traits<T>());
@@ -92,6 +111,12 @@ namespace tinystl {
 	static inline void buffer_move_urange(T* dest, T* first, T* last)
 	{
 		buffer_move_urange_traits(dest, first, last, pod_traits<T>());
+	}
+
+	template<typename T>
+	static inline void buffer_bmove_urange(T* dest, T* first, T* last)
+	{
+		buffer_bmove_urange_traits(dest, first, last, pod_traits<T>());
 	}
 
 	template<typename T>
@@ -157,11 +182,9 @@ namespace tinystl {
 
 		typedef T* pointer;
 		where = b->first + offset;
-		for (pointer it = b->last, end = where, dest = b->last + (size_t)(last - first); it != end; --it, --dest)
-		{
-			new(placeholder(), dest - 1) T(*(it - 1));
-			buffer_destroy_range(it - 1, it);
-		}
+		const size_t count = (size_t)(last - first);
+
+		buffer_bmove_urange(where + count, where, b->last);
 
 		for (; first != last; ++first, ++where)
 			new(placeholder(), where) T(*first);
@@ -174,13 +197,9 @@ namespace tinystl {
 	{
 		typedef T* pointer;
 		for (pointer it = last, end = b->last, dest = first; it != end; ++it, ++dest)
-		{
-			dest->~T();
-			new(dest) T(*it);
-		}
+			swap(*dest, *it);
 
-		for (pointer it = b->last - (last - first), end = b->last; it != end; ++it)
-			it->~T();
+		buffer_destroy_range(b->last - (last - first), b->last);
 
 		b->last -= (last - first);
 		return first;

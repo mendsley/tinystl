@@ -186,7 +186,8 @@ namespace tinystl {
 		where = b->first + offset;
 		const size_t count = (size_t)(last - first);
 
-		buffer_bmove_urange(where + count, where, b->last);
+		if (where != b->last)
+			buffer_bmove_urange(where + count, where, b->last);
 
 		for (; first != last; ++first, ++where)
 			new(placeholder(), where) T(*first);

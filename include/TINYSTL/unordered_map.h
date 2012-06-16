@@ -65,11 +65,20 @@ namespace tinystl {
 	template<typename Key, typename Value>
 	struct unordered_map_node
 	{
-		Key first;
+		unordered_map_node(const Key& key, const Value& value);
+
+		const Key first;
 		Value second;
 		unordered_map_node* next;
 		unordered_map_node* prev;
 	};
+
+	template<typename Key, typename Value>
+	unordered_map_node<Key, Value>::unordered_map_node(const Key& key, const Value& value)
+		: first(key)
+		, second(value)
+	{
+	}
 
 	template<typename Key, typename Value>
 	static void unordered_map_node_insert(unordered_map_node<Key, Value>* node, size_t hash, unordered_map_node<Key, Value>** buckets, size_t nbuckets)
@@ -251,9 +260,7 @@ namespace tinystl {
 
 		for (pointer it = *other.m_buckets.first; it; it = it->next)
 		{
-			unordered_map_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_map_node<Key, Value>))) unordered_map_node<Key, Value>;
-			newnode->first = it->first;
-			newnode->second = it->second;
+			unordered_map_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_map_node<Key, Value>))) unordered_map_node<Key, Value>(it->first, it->second);
 			newnode->next = newnode->prev = 0;
 
 			unordered_map_node_insert(newnode, Hash()(it->first), m_buckets.first, nbuckets - 1);
@@ -357,9 +364,7 @@ namespace tinystl {
 			return result;
 		}
 		
-		unordered_map_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_map_node<Key, Value>))) unordered_map_node<Key, Value>;
-		newnode->first = p.first;
-		newnode->second = p.second;
+		unordered_map_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_map_node<Key, Value>))) unordered_map_node<Key, Value>(p.first, p.second);
 		newnode->next = newnode->prev = 0;
 
 		const size_t nbuckets = (size_t)(m_buckets.last - m_buckets.first);

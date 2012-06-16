@@ -45,22 +45,10 @@ namespace tinystl {
 	}
 
 	template<typename T>
-	static inline size_t default_hash(const T& value)
+	inline size_t hash(const T& value)
 	{
 		const size_t asint = (size_t)value;
 		return hash_string((const char*)&asint, sizeof(asint));
-	}
-
-	template<typename T>
-	struct hash
-	{
-		size_t operator()(const T& value) const;
-	};
-
-	template<typename T>
-	size_t hash<T>::operator()(const T& value) const
-	{
-		return default_hash(value);
 	}
 }
 

@@ -218,7 +218,7 @@ namespace tinystl {
 		return true;
 	}
 
-	static inline size_t default_hash(const string& value)
+	static inline size_t hash(const string& value)
 	{
 		return hash_string(value.c_str(), value.size());
 	}

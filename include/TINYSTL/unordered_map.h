@@ -202,7 +202,7 @@ namespace tinystl {
 		return *node;
 	}
 
-	template<typename Key, typename Value, typename Hash = hash<Key>, typename Alloc = allocator>
+	template<typename Key, typename Value, typename Alloc = allocator>
 	class unordered_map
 	{
 	public:
@@ -242,16 +242,16 @@ namespace tinystl {
 		tinystl::buffer<pointer, Alloc> m_buckets;
 	};
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	unordered_map<Key, Value, Hash, Alloc>::unordered_map()
+	template<typename Key, typename Value, typename Alloc>
+	unordered_map<Key, Value, Alloc>::unordered_map()
 		: m_size(0)
 	{
 		buffer_init<pointer, Alloc>(&m_buckets);
 		buffer_resize<pointer, Alloc>(&m_buckets, 9, 0);
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	unordered_map<Key, Value, Hash, Alloc>::unordered_map(const unordered_map& other)
+	template<typename Key, typename Value, typename Alloc>
+	unordered_map<Key, Value, Alloc>::unordered_map(const unordered_map& other)
 		: m_size(other.m_size)
 	{
 		const size_t nbuckets = (size_t)(other.m_buckets.last - other.m_buckets.first);
@@ -263,54 +263,54 @@ namespace tinystl {
 			unordered_map_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_map_node<Key, Value>))) unordered_map_node<Key, Value>(it->first, it->second);
 			newnode->next = newnode->prev = 0;
 
-			unordered_map_node_insert(newnode, Hash()(it->first), m_buckets.first, nbuckets - 1);
+			unordered_map_node_insert(newnode, hash(it->first), m_buckets.first, nbuckets - 1);
 		}
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	unordered_map<Key, Value, Hash, Alloc>::~unordered_map()
+	template<typename Key, typename Value, typename Alloc>
+	unordered_map<Key, Value, Alloc>::~unordered_map()
 	{
 		clear();
 		buffer_destroy<pointer, Alloc>(&m_buckets);
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	unordered_map<Key, Value, Hash, Alloc>& unordered_map<Key, Value, Hash, Alloc>::operator=(const unordered_map<Key, Value, Hash, Alloc>& other)
+	template<typename Key, typename Value, typename Alloc>
+	unordered_map<Key, Value, Alloc>& unordered_map<Key, Value, Alloc>::operator=(const unordered_map<Key, Value, Alloc>& other)
 	{
-		unordered_map<Key, Value, Hash, Alloc>(other).swap(*this);
+		unordered_map<Key, Value, Alloc>(other).swap(*this);
 		return *this;
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	inline typename unordered_map<Key, Value, Hash, Alloc>::const_iterator unordered_map<Key, Value, Hash, Alloc>::begin() const
+	template<typename Key, typename Value, typename Alloc>
+	inline typename unordered_map<Key, Value, Alloc>::const_iterator unordered_map<Key, Value, Alloc>::begin() const
 	{
 		const_iterator cit;
 		cit.node = *m_buckets.first;
 		return cit;
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	inline typename unordered_map<Key, Value, Hash, Alloc>::const_iterator unordered_map<Key, Value, Hash, Alloc>::end() const
+	template<typename Key, typename Value, typename Alloc>
+	inline typename unordered_map<Key, Value, Alloc>::const_iterator unordered_map<Key, Value, Alloc>::end() const
 	{
 		const_iterator cit;
 		cit.node = 0;
 		return cit;
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	inline bool unordered_map<Key, Value, Hash, Alloc>::empty() const
+	template<typename Key, typename Value, typename Alloc>
+	inline bool unordered_map<Key, Value, Alloc>::empty() const
 	{
 		return m_size == 0;
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	inline size_t unordered_map<Key, Value, Hash, Alloc>::size() const
+	template<typename Key, typename Value, typename Alloc>
+	inline size_t unordered_map<Key, Value, Alloc>::size() const
 	{
 		return m_size;
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	inline void unordered_map<Key, Value, Hash, Alloc>::clear()
+	template<typename Key, typename Value, typename Alloc>
+	inline void unordered_map<Key, Value, Alloc>::clear()
 	{
 		pointer it = *m_buckets.first;
 		while (it)
@@ -327,12 +327,12 @@ namespace tinystl {
 		m_size = 0;
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	inline typename unordered_map<Key, Value, Hash, Alloc>::iterator unordered_map<Key, Value, Hash, Alloc>::find(const Key& key)
+	template<typename Key, typename Value, typename Alloc>
+	inline typename unordered_map<Key, Value, Alloc>::iterator unordered_map<Key, Value, Alloc>::find(const Key& key)
 	{
 		iterator result;
 
-		const size_t bucket = Hash()(key) & ((size_t)(m_buckets.last - m_buckets.first) - 2);
+		const size_t bucket = hash(key) & ((size_t)(m_buckets.last - m_buckets.first) - 2);
 		for (pointer it = m_buckets.first[bucket], end = m_buckets.first[bucket + 1]; it != end; it = it->next)
 		{
 			if (it->first == key)
@@ -346,14 +346,14 @@ namespace tinystl {
 		return result;
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	inline typename unordered_map<Key, Value, Hash, Alloc>::const_iterator unordered_map<Key, Value, Hash, Alloc>::find(const Key& key) const
+	template<typename Key, typename Value, typename Alloc>
+	inline typename unordered_map<Key, Value, Alloc>::const_iterator unordered_map<Key, Value, Alloc>::find(const Key& key) const
 	{
-		return const_cast<unordered_map<Key, Value, Hash, Alloc>*>(this)->find(key);
+		return const_cast<unordered_map<Key, Value, Alloc>*>(this)->find(key);
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	inline pair<typename unordered_map<Key, Value, Hash, Alloc>::iterator, bool> unordered_map<Key, Value, Hash, Alloc>::insert(const pair<Key, Value>& p)
+	template<typename Key, typename Value, typename Alloc>
+	inline pair<typename unordered_map<Key, Value, Alloc>::iterator, bool> unordered_map<Key, Value, Alloc>::insert(const pair<Key, Value>& p)
 	{
 		pair<iterator, bool> result;
 		result.second = false;
@@ -368,7 +368,7 @@ namespace tinystl {
 		newnode->next = newnode->prev = 0;
 
 		const size_t nbuckets = (size_t)(m_buckets.last - m_buckets.first);
-		unordered_map_node_insert(newnode, Hash()(p.first), m_buckets.first, nbuckets - 1);
+		unordered_map_node_insert(newnode, hash(p.first), m_buckets.first, nbuckets - 1);
 
 		++m_size;
 		if (m_size + 1 > 4 * nbuckets)
@@ -384,7 +384,7 @@ namespace tinystl {
 			{
 				const pointer next = root->next;
 				root->next = root->prev = 0;
-				unordered_map_node_insert(root, Hash()(root->first), buckets, newnbuckets);
+				unordered_map_node_insert(root, hash(root->first), buckets, newnbuckets);
 				root = next;
 			}
 		}
@@ -394,25 +394,24 @@ namespace tinystl {
 		return result;
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	void unordered_map<Key, Value, Hash, Alloc>::erase(const_iterator where)
+	template<typename Key, typename Value, typename Alloc>
+	void unordered_map<Key, Value, Alloc>::erase(const_iterator where)
 	{
-		const size_t hash = Hash()(where->first);
-		unordered_map_node_erase(where.node, hash, m_buckets.first, (size_t)(m_buckets.last - m_buckets.first) - 1);
+		unordered_map_node_erase(where.node, hash(where->first), m_buckets.first, (size_t)(m_buckets.last - m_buckets.first) - 1);
 
 		where->~unordered_map_node<Key, Value>();
 		Alloc::static_deallocate((void*)where.node, sizeof(unordered_map_node<Key, Value>));
 		--m_size;
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	Value& unordered_map<Key, Value, Hash, Alloc>::operator[](const Key& key)
+	template<typename Key, typename Value, typename Alloc>
+	Value& unordered_map<Key, Value, Alloc>::operator[](const Key& key)
 	{
 		return insert(pair<Key, Value>(key, Value())).first->second;
 	}
 
-	template<typename Key, typename Value, typename Hash, typename Alloc>
-	void unordered_map<Key, Value, Hash, Alloc>::swap(unordered_map& other)
+	template<typename Key, typename Value, typename Alloc>
+	void unordered_map<Key, Value, Alloc>::swap(unordered_map& other)
 	{
 		size_t tsize = other.m_size;
 		other.m_size = m_size, m_size = tsize;

@@ -129,7 +129,6 @@ namespace tinystl {
 			return;
 
 		const size_t size = (size_t)(m_last - m_first);
-		const size_t current = (size_t)(m_capacity - m_first);
 
 		pointer newfirst = new char[capacity + 1];
 		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit)

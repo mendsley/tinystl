@@ -28,6 +28,7 @@
 #define TINYSTL_STRING_H
 
 #include <TINYSTL/stddef.h>
+#include <TINYSTL/hash.h>
 
 namespace tinystl {
 
@@ -215,6 +216,11 @@ namespace tinystl {
 		}
 
 		return true;
+	}
+
+	static inline size_t default_hash(const string& value)
+	{
+		return hash_string(value.c_str(), value.size());
 	}
 }
 

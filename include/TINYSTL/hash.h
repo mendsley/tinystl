@@ -28,7 +28,6 @@
 #define TINYSTL_STRINGHASH_H
 
 #include <TINYSTL/stddef.h>
-#include <TINYSTL/string.h>
 
 namespace tinystl {
 
@@ -50,11 +49,6 @@ namespace tinystl {
 	{
 		const size_t asint = (size_t)value;
 		return hash_string((const char*)&asint, sizeof(asint));
-	}
-
-	static inline size_t default_hash(const string& value)
-	{
-		return hash_string(value.c_str(), value.size());
 	}
 
 	template<typename T>

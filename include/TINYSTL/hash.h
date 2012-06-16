@@ -32,23 +32,41 @@
 
 namespace tinystl {
 
-	struct string_hash
-	{
-		size_t operator()(const string& str) const;
-	};
-
-	inline size_t string_hash::operator()(const string& str) const
+	static inline size_t hash_string(const char* str, size_t len)
 	{
 		// Implementation of sdbm a public domain string hash from Ozan Yigit
 		// see: http://www.eecs.harvard.edu/margo/papers/usenix91/paper.ps
 
 		size_t hash = 0;
-		const char* it = str.c_str();
-		const char* end = it + str.size();
-		while (it != end)
-			hash = *it++ + (hash << 6) + (hash << 16) - hash;
+		typedef const char* pointer;
+		for (pointer it = str, end = str + len; it != end; ++it)
+			hash = *it + (hash << 6) + (hash << 16) - hash;
 
 		return hash;
+	}
+
+	template<typename T>
+	static inline size_t default_hash(const T& value)
+	{
+		const size_t asint = (size_t)value;
+		return hash_string((const char*)&asint, sizeof(asint));
+	}
+
+	static inline size_t default_hash(const string& value)
+	{
+		return hash_string(value.c_str(), value.size());
+	}
+
+	template<typename T>
+	struct hash
+	{
+		size_t operator()(const T& value) const;
+	};
+
+	template<typename T>
+	size_t hash<T>::operator()(const T& value) const
+	{
+		return default_hash(value);
 	}
 }
 

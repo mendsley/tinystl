@@ -11,7 +11,7 @@ project "UnitTest++"
 		"../3rdparty/UnitTest++/src/*.h",
 	}
 
-	configuration { "linux" }
+	configuration { "linux or macosx" }
 		files {
 			"../3rdparty/UnitTest++/src/Posix/**.cpp",
 			"../3rdparty/UnitTest++/src/Posix/**.h",

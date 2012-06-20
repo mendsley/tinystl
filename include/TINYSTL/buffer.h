@@ -54,6 +54,12 @@ namespace tinystl {
 	}
 
 	template<typename T>
+	static inline void buffer_destroy_range(T* first, T* last)
+	{
+		buffer_destroy_range_traits(first, last, pod_traits<T>());
+	}
+
+	template<typename T>
 	static inline void buffer_fill_urange_traits(T* first, T* last, const T& value, pod_traits<T, false>)
 	{
 		for (; first < last; ++first)
@@ -101,12 +107,6 @@ namespace tinystl {
 		dest += (last - first);
 		for (T* it = last; it != first; --it, --dest)
 			*(dest - 1) = *(it - 1);
-	}
-
-	template<typename T>
-	static inline void buffer_destroy_range(T* first, T* last)
-	{
-		buffer_destroy_range_traits(first, last, pod_traits<T>());
 	}
 
 	template<typename T>

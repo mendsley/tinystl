@@ -27,6 +27,7 @@
 #ifndef TINYSTL_STRING_H
 #define TINYSTL_STRING_H
 
+#include <TINYSTL/allocator.h>
 #include <TINYSTL/stddef.h>
 #include <TINYSTL/hash.h>
 
@@ -105,7 +106,7 @@ namespace tinystl {
 	inline string::~string()
 	{
 		if (m_first != m_buffer)
-			delete[] m_first;
+			TINYSTL_ALLOCATOR::static_deallocate(m_first, m_capacity - m_first);
 	}
 
 	inline string& string::operator=(const string& other)
@@ -131,11 +132,11 @@ namespace tinystl {
 
 		const size_t size = (size_t)(m_last - m_first);
 
-		pointer newfirst = new char[capacity + 1];
+		pointer newfirst = (pointer)TINYSTL_ALLOCATOR::static_allocate(capacity + 1);
 		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit)
 			*newit = *it;
 		if (m_first != m_buffer)
-			delete[] m_first;
+			TINYSTL_ALLOCATOR::static_deallocate(m_first, m_capacity - m_first);
 
 		m_first = newfirst;
 		m_last = newfirst + size;

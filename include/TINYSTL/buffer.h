@@ -33,7 +33,7 @@
 
 namespace tinystl {
 
-	template<typename T, typename Alloc = allocator>
+	template<typename T, typename Alloc = TINYSTL_ALLOCATOR>
 	struct buffer
 	{
 		T* first;

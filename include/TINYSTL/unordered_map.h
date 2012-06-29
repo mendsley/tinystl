@@ -202,7 +202,7 @@ namespace tinystl {
 		return *node;
 	}
 
-	template<typename Key, typename Value, typename Alloc = allocator>
+	template<typename Key, typename Value, typename Alloc = TINYSTL_ALLOCATOR>
 	class unordered_map
 	{
 	public:

@@ -45,4 +45,8 @@ namespace tinystl {
 	};
 }
 
+#ifndef TINYSTL_ALLOCATOR
+#	define TINYSTL_ALLOCATOR ::tinystl::allocator
+#endif
+
 #endif

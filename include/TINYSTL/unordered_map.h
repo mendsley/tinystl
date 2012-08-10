@@ -218,6 +218,9 @@ namespace tinystl {
 		typedef unordered_map_iterator<const unordered_map_node<Key, Value> > const_iterator;
 		typedef unordered_map_iterator<unordered_map_node<Key, Value> > iterator;
 
+		iterator begin();
+		iterator end();
+
 		const_iterator begin() const;
 		const_iterator end() const;
 
@@ -279,6 +282,22 @@ namespace tinystl {
 	{
 		unordered_map<Key, Value, Alloc>(other).swap(*this);
 		return *this;
+	}
+
+	template<typename Key, typename Value, typename Alloc>
+	inline typename unordered_map<Key, Value, Alloc>::iterator unordered_map<Key, Value, Alloc>::begin()
+	{
+		iterator it;
+		it.node = *m_buckets.first;
+		return it;
+	}
+
+	template<typename Key, typename Value, typename Alloc>
+	inline typename unordered_map<Key, Value, Alloc>::iterator unordered_map<Key, Value, Alloc>::end()
+	{
+		iterator it;
+		it.node = 0;
+		return it;
 	}
 
 	template<typename Key, typename Value, typename Alloc>

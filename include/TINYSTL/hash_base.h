@@ -27,7 +27,7 @@
 #ifndef TINYSTL_HASH_BASE_H
 #define TINYSTL_HASH_BASE_H
 
-#include <TINYSTL/allocator.h>
+#include <TINYSTL/stddef.h>
 
 namespace tinystl {
 
@@ -61,29 +61,45 @@ namespace tinystl {
 
 
 	template<typename Key, typename Value>
-	struct unordered_map_node
+	struct unordered_hash_node
 	{
-		unordered_map_node(const Key& key, const Value& value);
+		unordered_hash_node(const Key& key, const Value& value);
 
 		const Key first;
 		Value second;
-		unordered_map_node* next;
-		unordered_map_node* prev;
+		unordered_hash_node* next;
+		unordered_hash_node* prev;
 	};
 
 	template<typename Key, typename Value>
-	unordered_map_node<Key, Value>::unordered_map_node(const Key& key, const Value& value)
+	unordered_hash_node<Key, Value>::unordered_hash_node(const Key& key, const Value& value)
 		: first(key)
 		, second(value)
 	{
 	}
 
+	template <typename Key>
+	struct unordered_hash_node<Key, void>
+	{
+		unordered_hash_node(const Key& key);
+
+		const Key first;
+		unordered_hash_node* next;
+		unordered_hash_node* prev;
+	};
+
+	template<typename Key>
+	unordered_hash_node<Key, void>::unordered_hash_node(const Key& key)
+		: first(key)
+	{
+	}
+
 	template<typename Key, typename Value>
-	static void unordered_map_node_insert(unordered_map_node<Key, Value>* node, size_t hash, unordered_map_node<Key, Value>** buckets, size_t nbuckets)
+	static void unordered_hash_node_insert(unordered_hash_node<Key, Value>* node, size_t hash, unordered_hash_node<Key, Value>** buckets, size_t nbuckets)
 	{
 		size_t bucket = hash & (nbuckets - 1);
 
-		unordered_map_node<Key, Value>* it = buckets[bucket + 1];
+		unordered_hash_node<Key, Value>* it = buckets[bucket + 1];
 		node->next = it;
 		if (it)
 		{
@@ -98,7 +114,7 @@ namespace tinystl {
 			while (newbucket && !buckets[newbucket])
 				--newbucket;
 
-			unordered_map_node<Key, Value>* prev = buckets[newbucket];
+			unordered_hash_node<Key, Value>* prev = buckets[newbucket];
 			while (prev && prev->next)
 				prev = prev->next;
 
@@ -117,11 +133,11 @@ namespace tinystl {
 	}
 
 	template<typename Key, typename Value>
-	static inline void unordered_map_node_erase(const unordered_map_node<Key, Value>* where, size_t hash, unordered_map_node<Key, Value>** buckets, size_t nbuckets)
+	static inline void unordered_hash_node_erase(const unordered_hash_node<Key, Value>* where, size_t hash, unordered_hash_node<Key, Value>** buckets, size_t nbuckets)
 	{
 		size_t bucket = hash & (nbuckets - 1);
 
-		unordered_map_node<Key, Value>* next = where->next;
+		unordered_hash_node<Key, Value>* next = where->next;
 		for (; buckets[bucket] == where; --bucket)
 		{
 			buckets[bucket] = next;
@@ -136,7 +152,7 @@ namespace tinystl {
 	}
 
 	template<typename Node>
-	struct unordered_map_iterator
+	struct unordered_hash_iterator
 	{
 		Node* operator->() const;
 		Node& operator*() const;
@@ -144,10 +160,10 @@ namespace tinystl {
 	};
 
 	template<typename Node>
-	struct unordered_map_iterator<const Node>
+	struct unordered_hash_iterator<const Node>
 	{
-		unordered_map_iterator() {}
-		unordered_map_iterator(unordered_map_iterator<Node> other)
+		unordered_hash_iterator() {}
+		unordered_hash_iterator(unordered_hash_iterator<Node> other)
 			: node(other.node)
 		{
 
@@ -158,46 +174,81 @@ namespace tinystl {
 		const Node* node;
 	};
 
+	template<typename Key>
+	struct unordered_hash_iterator<const unordered_hash_node<Key, void> >
+	{
+		const Key* operator->() const;
+		const Key& operator*() const;
+		unordered_hash_node<Key, void>* node;
+	};
+
 	template<typename LNode, typename RNode>
-	static inline bool operator==(const unordered_map_iterator<LNode>& lhs, const unordered_map_iterator<RNode>& rhs)
+	static inline bool operator==(const unordered_hash_iterator<LNode>& lhs, const unordered_hash_iterator<RNode>& rhs)
 	{
 		return lhs.node == rhs.node;
 	}
 
 	template<typename LNode, typename RNode>
-	static inline bool operator!=(const unordered_map_iterator<LNode>& lhs, const unordered_map_iterator<RNode>& rhs)
+	static inline bool operator!=(const unordered_hash_iterator<LNode>& lhs, const unordered_hash_iterator<RNode>& rhs)
 	{
 		return lhs.node != rhs.node;
 	}
 
 	template<typename Node>
-	static inline void operator++(unordered_map_iterator<Node>& lhs)
+	static inline void operator++(unordered_hash_iterator<Node>& lhs)
 	{
 		lhs.node = lhs.node->next;
 	}
 
 	template<typename Node>
-	inline Node* unordered_map_iterator<Node>::operator->() const
+	inline Node* unordered_hash_iterator<Node>::operator->() const
 	{
 		return node;
 	}
 
 	template<typename Node>
-	inline Node& unordered_map_iterator<Node>::operator*() const
+	inline Node& unordered_hash_iterator<Node>::operator*() const
 	{
 		return *node;
 	}
 
 	template<typename Node>
-	inline const Node* unordered_map_iterator<const Node>::operator->() const
+	inline const Node* unordered_hash_iterator<const Node>::operator->() const
 	{
 		return node;
 	}
 
 	template<typename Node>
-	inline const Node& unordered_map_iterator<const Node>::operator*() const
+	inline const Node& unordered_hash_iterator<const Node>::operator*() const
 	{
 		return *node;
+	}
+
+	template<typename Key>
+	inline const Key* unordered_hash_iterator<const unordered_hash_node<Key, void> >::operator->() const
+	{
+		return &node->first;
+	}
+
+	template<typename Key>
+	inline const Key& unordered_hash_iterator<const unordered_hash_node<Key, void> >::operator*() const
+	{
+		return node->first;
+	}
+
+	template<typename Node, typename Key>
+	static inline Node unordered_hash_find(const Key& key, Node* buckets, size_t nbuckets)
+	{
+		const size_t bucket = hash(key) & (nbuckets - 2);
+		for (Node it = buckets[bucket], end = buckets[bucket+1]; it != end; it = it->next)
+		{
+			if (it->first == key)
+			{
+				return it;
+			}
+		}
+
+		return 0;
 	}
 }
 #endif

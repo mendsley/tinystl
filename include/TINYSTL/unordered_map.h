@@ -47,8 +47,8 @@ namespace tinystl {
 
 		typedef pair<Key, Value> value_type;
 		
-		typedef unordered_map_iterator<const unordered_map_node<Key, Value> > const_iterator;
-		typedef unordered_map_iterator<unordered_map_node<Key, Value> > iterator;
+		typedef unordered_hash_iterator<const unordered_hash_node<Key, Value> > const_iterator;
+		typedef unordered_hash_iterator<unordered_hash_node<Key, Value> > iterator;
 
 		iterator begin();
 		iterator end();
@@ -71,7 +71,7 @@ namespace tinystl {
 
 	private:
 
-		typedef unordered_map_node<Key, Value>* pointer;
+		typedef unordered_hash_node<Key, Value>* pointer;
 
 		size_t m_size;
 		tinystl::buffer<pointer, Alloc> m_buckets;
@@ -95,10 +95,10 @@ namespace tinystl {
 
 		for (pointer it = *other.m_buckets.first; it; it = it->next)
 		{
-			unordered_map_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_map_node<Key, Value>))) unordered_map_node<Key, Value>(it->first, it->second);
+			unordered_hash_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_hash_node<Key, Value>))) unordered_hash_node<Key, Value>(it->first, it->second);
 			newnode->next = newnode->prev = 0;
 
-			unordered_map_node_insert(newnode, hash(it->first), m_buckets.first, nbuckets - 1);
+			unordered_hash_node_insert(newnode, hash(it->first), m_buckets.first, nbuckets - 1);
 		}
 	}
 
@@ -167,8 +167,8 @@ namespace tinystl {
 		while (it)
 		{
 			const pointer next = it->next;
-			it->~unordered_map_node<Key, Value>();
-			Alloc::static_deallocate(it, sizeof(unordered_map_node<Key, Value>));
+			it->~unordered_hash_node<Key, Value>();
+			Alloc::static_deallocate(it, sizeof(unordered_hash_node<Key, Value>));
 
 			it = next;
 		}
@@ -182,25 +182,16 @@ namespace tinystl {
 	inline typename unordered_map<Key, Value, Alloc>::iterator unordered_map<Key, Value, Alloc>::find(const Key& key)
 	{
 		iterator result;
-
-		const size_t bucket = hash(key) & ((size_t)(m_buckets.last - m_buckets.first) - 2);
-		for (pointer it = m_buckets.first[bucket], end = m_buckets.first[bucket + 1]; it != end; it = it->next)
-		{
-			if (it->first == key)
-			{
-				result.node = it;
-				return result;
-			}
-		}
-
-		result.node = 0;
+		result.node = unordered_hash_find(key, m_buckets.first, (size_t)(m_buckets.last - m_buckets.first));
 		return result;
 	}
 
 	template<typename Key, typename Value, typename Alloc>
 	inline typename unordered_map<Key, Value, Alloc>::const_iterator unordered_map<Key, Value, Alloc>::find(const Key& key) const
 	{
-		return const_cast<unordered_map<Key, Value, Alloc>*>(this)->find(key);
+		iterator result;
+		result.node = unordered_hash_find(key, m_buckets.first, (size_t)(m_buckets.last - m_buckets.first));
+		return result;
 	}
 
 	template<typename Key, typename Value, typename Alloc>
@@ -215,11 +206,11 @@ namespace tinystl {
 			return result;
 		}
 		
-		unordered_map_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_map_node<Key, Value>))) unordered_map_node<Key, Value>(p.first, p.second);
+		unordered_hash_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_hash_node<Key, Value>))) unordered_hash_node<Key, Value>(p.first, p.second);
 		newnode->next = newnode->prev = 0;
 
 		const size_t nbuckets = (size_t)(m_buckets.last - m_buckets.first);
-		unordered_map_node_insert(newnode, hash(p.first), m_buckets.first, nbuckets - 1);
+		unordered_hash_node_insert(newnode, hash(p.first), m_buckets.first, nbuckets - 1);
 
 		++m_size;
 		if (m_size + 1 > 4 * nbuckets)
@@ -229,13 +220,13 @@ namespace tinystl {
 			const size_t newnbuckets = ((size_t)(m_buckets.last - m_buckets.first) - 1) * 8;
 			m_buckets.last = m_buckets.first;
 			buffer_resize<pointer, Alloc>(&m_buckets, newnbuckets + 1, 0);
-			unordered_map_node<Key, Value>** buckets = m_buckets.first;
+			unordered_hash_node<Key, Value>** buckets = m_buckets.first;
 
 			while (root)
 			{
 				const pointer next = root->next;
 				root->next = root->prev = 0;
-				unordered_map_node_insert(root, hash(root->first), buckets, newnbuckets);
+				unordered_hash_node_insert(root, hash(root->first), buckets, newnbuckets);
 				root = next;
 			}
 		}
@@ -248,10 +239,10 @@ namespace tinystl {
 	template<typename Key, typename Value, typename Alloc>
 	void unordered_map<Key, Value, Alloc>::erase(const_iterator where)
 	{
-		unordered_map_node_erase(where.node, hash(where->first), m_buckets.first, (size_t)(m_buckets.last - m_buckets.first) - 1);
+		unordered_hash_node_erase(where.node, hash(where->first), m_buckets.first, (size_t)(m_buckets.last - m_buckets.first) - 1);
 
-		where->~unordered_map_node<Key, Value>();
-		Alloc::static_deallocate((void*)where.node, sizeof(unordered_map_node<Key, Value>));
+		where->~unordered_hash_node<Key, Value>();
+		Alloc::static_deallocate((void*)where.node, sizeof(unordered_hash_node<Key, Value>));
 		--m_size;
 	}
 

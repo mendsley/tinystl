@@ -34,115 +34,96 @@
 namespace tinystl {
 
 	template<typename T, typename Alloc = TINYSTL_ALLOCATOR>
-	struct buffer
-	{
+	struct buffer {
 		T* first;
 		T* last;
 		T* capacity;
 	};
 
 	template<typename T>
-	static inline void buffer_destroy_range_traits(T* first, T* last, pod_traits<T, false>)
-	{
+	static inline void buffer_destroy_range_traits(T* first, T* last, pod_traits<T, false>) {
 		for (; first < last; ++first)
 			first->~T();
 	}
 
 	template<typename T>
-	static inline void buffer_destroy_range_traits(T*, T*, pod_traits<T, true>)
-	{
+	static inline void buffer_destroy_range_traits(T*, T*, pod_traits<T, true>) {
 	}
 
 	template<typename T>
-	static inline void buffer_destroy_range(T* first, T* last)
-	{
+	static inline void buffer_destroy_range(T* first, T* last) {
 		buffer_destroy_range_traits(first, last, pod_traits<T>());
 	}
 
 	template<typename T>
-	static inline void buffer_fill_urange_traits(T* first, T* last, const T& value, pod_traits<T, false>)
-	{
+	static inline void buffer_fill_urange_traits(T* first, T* last, const T& value, pod_traits<T, false>) {
 		for (; first < last; ++first)
 			new(placeholder(), first) T(value);
 	}
 
 	template<typename T>
-	static inline void buffer_fill_urange_traits(T* first, T* last, const T& value, pod_traits<T, true>)
-	{
+	static inline void buffer_fill_urange_traits(T* first, T* last, const T& value, pod_traits<T, true>) {
 		for (; first < last; ++first)
 			*first = value;
 	}
 
 	template<typename T>
-	static inline void buffer_move_urange_traits(T* dest, T* first, T* last, pod_traits<T, false>)
-	{
+	static inline void buffer_move_urange_traits(T* dest, T* first, T* last, pod_traits<T, false>) {
 		for (T* it = first; it != last; ++it, ++dest)
-		{
 			move_construct(dest, *it);
-		}
 		buffer_destroy_range(first, last);
 	}
 
 	template<typename T>
-	static inline void buffer_move_urange_traits(T* dest, T* first, T* last, pod_traits<T, true>)
-	{
+	static inline void buffer_move_urange_traits(T* dest, T* first, T* last, pod_traits<T, true>) {
 		for (; first != last; ++first, ++dest)
 			*dest = *first;
 	}
 
 	template<typename T>
-	static inline void buffer_bmove_urange_traits(T* dest, T* first, T* last, pod_traits<T, false>)
-	{
+	static inline void buffer_bmove_urange_traits(T* dest, T* first, T* last, pod_traits<T, false>) {
 		dest += (last - first);
-		for (T* it = last; it != first; --it, --dest)
-		{
+		for (T* it = last; it != first; --it, --dest) {
 			move_construct(dest - 1, *(it - 1));
 			buffer_destroy_range(it - 1, it);
 		}
 	}
 
 	template<typename T>
-	static inline void buffer_bmove_urange_traits(T* dest, T* first, T* last, pod_traits<T, true>)
-	{
+	static inline void buffer_bmove_urange_traits(T* dest, T* first, T* last, pod_traits<T, true>) {
 		dest += (last - first);
 		for (T* it = last; it != first; --it, --dest)
 			*(dest - 1) = *(it - 1);
 	}
 
 	template<typename T>
-	static inline void buffer_move_urange(T* dest, T* first, T* last)
-	{
+	static inline void buffer_move_urange(T* dest, T* first, T* last) {
 		buffer_move_urange_traits(dest, first, last, pod_traits<T>());
 	}
 
 	template<typename T>
-	static inline void buffer_bmove_urange(T* dest, T* first, T* last)
-	{
+	static inline void buffer_bmove_urange(T* dest, T* first, T* last) {
 		buffer_bmove_urange_traits(dest, first, last, pod_traits<T>());
 	}
 
 	template<typename T>
-	static inline void buffer_fill_urange(T* first, T* last, const T& value)
-	{
+	static inline void buffer_fill_urange(T* first, T* last, const T& value) {
 		buffer_fill_urange_traits(first, last, value, pod_traits<T>());
 	}
 
 	template<typename T, typename Alloc>
-	static inline void buffer_init(buffer<T, Alloc>* b)
-	{
+	static inline void buffer_init(buffer<T, Alloc>* b) {
 		b->first = b->last = b->capacity = 0;
 	}
 
 	template<typename T, typename Alloc>
-	static inline void buffer_destroy(buffer<T, Alloc>* b)
-	{
+	static inline void buffer_destroy(buffer<T, Alloc>* b) {
 		buffer_destroy_range(b->first, b->last);
 		Alloc::static_deallocate(b->first, (size_t)((char*)b->first - (char*)b->last));
 	}
 
 	template<typename T, typename Alloc>
-	static inline void buffer_reserve(buffer<T, Alloc>* b, size_t capacity)
-	{
+	static inline void buffer_reserve(buffer<T, Alloc>* b, size_t capacity) {
 		if (b->first + capacity <= b->capacity)
 			return;
 
@@ -158,8 +139,7 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	static inline void buffer_resize(buffer<T, Alloc>* b, size_t size, const T& value)
-	{
+	static inline void buffer_resize(buffer<T, Alloc>* b, size_t size, const T& value) {
 		buffer_reserve(b, size);
 
 		buffer_fill_urange(b->last, b->first + size, value);
@@ -168,15 +148,13 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	static inline void buffer_clear(buffer<T, Alloc>* b)
-	{
+	static inline void buffer_clear(buffer<T, Alloc>* b) {
 		buffer_destroy_range(b->first, b->last);
 		b->last = b->first;
 	}
 
 	template<typename T, typename Alloc>
-	static inline void buffer_insert(buffer<T, Alloc>* b, T* where, const T* first, const T* last)
-	{
+	static inline void buffer_insert(buffer<T, Alloc>* b, T* where, const T* first, const T* last) {
 		const size_t offset = (size_t)(where - b->first);
 		const size_t newsize = (size_t)((b->last - b->first) + (last - first));
 		if (b->first + newsize > b->capacity)
@@ -196,8 +174,7 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	static inline T* buffer_erase(buffer<T, Alloc>* b, T* first, T* last)
-	{
+	static inline T* buffer_erase(buffer<T, Alloc>* b, T* first, T* last) {
 		typedef T* pointer;
 		for (pointer it = last, end = b->last, dest = first; it != end; ++it, ++dest)
 			move(*dest, *it);
@@ -209,8 +186,7 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	static inline void buffer_swap(buffer<T, Alloc>* b, buffer<T, Alloc>* other)
-	{
+	static inline void buffer_swap(buffer<T, Alloc>* b, buffer<T, Alloc>* other) {
 		typedef T* pointer;
 		const pointer tfirst = b->first, tlast = b->last, tcapacity = b->capacity;
 		b->first = other->first, b->last = other->last, b->capacity = other->capacity;

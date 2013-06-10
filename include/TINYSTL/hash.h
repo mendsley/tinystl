@@ -31,8 +31,7 @@
 
 namespace tinystl {
 
-	static inline size_t hash_string(const char* str, size_t len)
-	{
+	static inline size_t hash_string(const char* str, size_t len) {
 		// Implementation of sdbm a public domain string hash from Ozan Yigit
 		// see: http://www.eecs.harvard.edu/margo/papers/usenix91/paper.ps
 
@@ -45,8 +44,7 @@ namespace tinystl {
 	}
 
 	template<typename T>
-	inline size_t hash(const T& value)
-	{
+	inline size_t hash(const T& value) {
 		const size_t asint = (size_t)value;
 		return hash_string((const char*)&asint, sizeof(asint));
 	}

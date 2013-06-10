@@ -33,8 +33,7 @@
 
 namespace tinystl {
 
-	class string
-	{
+	class string {
 	public:
 		string();
 		string(const string& other);
@@ -103,20 +102,17 @@ namespace tinystl {
 		append(sz, sz + len);
 	}
 
-	inline string::~string()
-	{
+	inline string::~string() {
 		if (m_first != m_buffer)
 			TINYSTL_ALLOCATOR::static_deallocate(m_first, m_capacity - m_first);
 	}
 
-	inline string& string::operator=(const string& other)
-	{
+	inline string& string::operator=(const string& other) {
 		string(other).swap(*this);
 		return *this;
 	}
 
-	inline const char* string::c_str() const
-	{
+	inline const char* string::c_str() const {
 		return m_first;
 	}
 
@@ -125,8 +121,7 @@ namespace tinystl {
 		return (size_t)(m_last - m_first);
 	}
 
-	inline void string::reserve(size_t capacity)
-	{
+	inline void string::reserve(size_t capacity) {
 		if (m_first + capacity + 1 <= m_capacity)
 			return;
 
@@ -143,8 +138,7 @@ namespace tinystl {
 		m_capacity = m_first + capacity;
 	}
 
-	inline void string::resize(size_t size)
-	{
+	inline void string::resize(size_t size) {
 		reserve(size);
 		for (pointer it = m_last, end = m_first + size + 1; it < end; ++it)
 			*it = 0;
@@ -152,8 +146,7 @@ namespace tinystl {
 		m_last += size;
 	}
 
-	inline void string::append(const char* first, const char* last)
-	{
+	inline void string::append(const char* first, const char* last) {
 		const size_t newsize = (size_t)((m_last - m_first) + (last - first) + 1);
 		if (m_first + newsize > m_capacity)
 			reserve((newsize * 3) / 2);
@@ -163,8 +156,7 @@ namespace tinystl {
 		*m_last = 0;
 	}
 
-	inline void string::swap(string& other)
-	{
+	inline void string::swap(string& other) {
 		const pointer tfirst = m_first, tlast = m_last, tcapacity = m_capacity;
 		m_first = other.m_first, m_last = other.m_last, m_capacity = other.m_capacity;
 		other.m_first = tfirst, other.m_last = tlast, other.m_capacity = tcapacity;
@@ -172,13 +164,10 @@ namespace tinystl {
 		char tbuffer[c_nbuffer];
 
 		if (m_first == other.m_buffer)
-		{
 			for  (pointer it = other.m_buffer, end = m_last, out = tbuffer; it != end; ++it, ++out)
 				*out = *it;
-		}
 
-		if (other.m_first == m_buffer)
-		{
+		if (other.m_first == m_buffer) {
 			other.m_last = other.m_last - other.m_first + other.m_buffer;
 			other.m_first = other.m_buffer;
 			other.m_capacity = other.m_buffer + c_nbuffer;
@@ -188,8 +177,7 @@ namespace tinystl {
 			*other.m_last = 0;
 		}
 
-		if (m_first == other.m_buffer)
-		{
+		if (m_first == other.m_buffer) {
 			m_last = m_last - m_first + m_buffer;
 			m_first = m_buffer;
 			m_capacity = m_buffer + c_nbuffer;
@@ -200,8 +188,7 @@ namespace tinystl {
 		}
 	}
 
-	inline bool operator==(const string& lhs, const string& rhs)
-	{
+	inline bool operator==(const string& lhs, const string& rhs) {
 		typedef const char* pointer;
 
 		const size_t lsize = lhs.size(), rsize = rhs.size();
@@ -211,16 +198,13 @@ namespace tinystl {
 		pointer lit = lhs.c_str(), rit = rhs.c_str();
 		pointer lend = lit + lsize;
 		while (lit != lend)
-		{
 			if (*lit++ != *rit++)
 				return false;
-		}
 
 		return true;
 	}
 
-	static inline size_t hash(const string& value)
-	{
+	static inline size_t hash(const string& value) {
 		return hash_string(value.c_str(), value.size());
 	}
 }

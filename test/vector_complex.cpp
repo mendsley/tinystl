@@ -30,8 +30,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-struct complex
-{
+struct complex {
 	complex() {data = 0;}
 	complex(const char* s) { data = strdup(s); }
 	~complex() { free(data); }
@@ -42,8 +41,7 @@ struct complex
 	char* data;
 };
 
-static inline bool operator==(const complex& lhs, const complex& rhs)
-{
+static inline bool operator==(const complex& lhs, const complex& rhs) {
 	if (lhs.data == 0 && rhs.data == 0)
 		return true;
 	if (lhs.data != 0 && rhs.data != 0)
@@ -51,8 +49,7 @@ static inline bool operator==(const complex& lhs, const complex& rhs)
 	return false;
 }
 
-TEST(vector_complex_constructor)
-{
+TEST(vector_complex_constructor) {
 	typedef tinystl::vector<complex> vector;
 
 	{
@@ -76,9 +73,7 @@ TEST(vector_complex_constructor)
 
 		vector::iterator it = v.begin(), end = v.end();
 		for (; it != end; ++it)
-		{
 			CHECK(*it == value);
-		}
 	}
 	{
 		const size_t count = 24;
@@ -87,9 +82,7 @@ TEST(vector_complex_constructor)
 		CHECK(v.size() == count);
 		vector::iterator it = v.begin(), end = v.end();
 		for (; it != end; ++it)
-		{
 			CHECK(*it == complex());
-		}
 	}
 	{
 		const complex array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
@@ -101,8 +94,7 @@ TEST(vector_complex_constructor)
 	}
 }
 
-TEST(vector_complex_assignment)
-{
+TEST(vector_complex_assignment) {
 	typedef tinystl::vector<complex> vector;
 
 	{
@@ -119,8 +111,7 @@ TEST(vector_complex_assignment)
 	}
 }
 
-TEST(vector_complex_pushback)
-{
+TEST(vector_complex_pushback) {
 	tinystl::vector<complex> v;
 	v.push_back("42");
 
@@ -128,21 +119,18 @@ TEST(vector_complex_pushback)
 	CHECK(v[0] == "42");
 }
 
-TEST(vector_complex_vector)
-{
+TEST(vector_complex_vector) {
 	tinystl::vector< tinystl::vector<complex> > v(10, tinystl::vector<complex>());
 
 	tinystl::vector< tinystl::vector<complex> >::iterator it = v.begin(), end = v.end();
-	for (; it != end; ++it)
-	{
+	for (; it != end; ++it) {
 		CHECK( (*it).empty() );
 		CHECK( (*it).size() == 0 );
 		CHECK( (*it).begin() == (*it).end() );
 	}
 }
 
-TEST(vector_complex_swap)
-{
+TEST(vector_complex_swap) {
 	tinystl::vector<complex> v1;
 	v1.push_back("12");
 	v1.push_back("20");
@@ -159,8 +147,7 @@ TEST(vector_complex_swap)
 	CHECK(v2[1] == "20");
 }
 
-TEST(vector_complex_popback)
-{
+TEST(vector_complex_popback) {
 	tinystl::vector<complex> v;
 	v.push_back("12");
 	v.push_back("24");
@@ -173,8 +160,7 @@ TEST(vector_complex_popback)
 	CHECK(v.size() == 1);
 }
 
-TEST(vector_complex_assign)
-{
+TEST(vector_complex_assign) {
 	tinystl::vector<complex> v;
 
 	CHECK(v.size() == 0);
@@ -185,8 +171,7 @@ TEST(vector_complex_assign)
 	CHECK( std::equal(v.begin(), v.end(), array) );
 }
 
-TEST(vector_complex_erase)
-{
+TEST(vector_complex_erase) {
 	const complex array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 	tinystl::vector<complex> v(array, array + 10);
 
@@ -206,8 +191,7 @@ TEST(vector_complex_erase)
 	CHECK(v[1] == "9");
 }
 
-TEST(vector_complex_insert)
-{
+TEST(vector_complex_insert) {
 	const complex array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 	tinystl::vector<complex> v(array, array + 10);
 
@@ -229,8 +213,7 @@ TEST(vector_complex_insert)
 	CHECK( std::equal(v.begin(), v.end(), finalarray) );
 }
 
-TEST(vector_complex_iterator)
-{
+TEST(vector_complex_iterator) {
 	const complex array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 
 	tinystl::vector<complex> v(array, array + 10);

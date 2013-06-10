@@ -34,8 +34,7 @@ namespace tinystl {
 	struct placeholder {};
 }
 
-inline void* operator new(size_t, tinystl::placeholder, void* ptr)
-{
+inline void* operator new(size_t, tinystl::placeholder, void* ptr) {
 	return ptr;
 }
 

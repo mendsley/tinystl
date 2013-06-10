@@ -28,8 +28,7 @@
 #include <UnitTest++.h>
 #include <algorithm>
 
-TEST(vector_constructor)
-{
+TEST(vector_constructor) {
 	typedef tinystl::vector<int> vector;
 
 	{
@@ -53,9 +52,7 @@ TEST(vector_constructor)
 
 		vector::iterator it = v.begin(), end = v.end();
 		for (; it != end; ++it)
-		{
 			CHECK(*it == value);
-		}
 	}
 	{
 		const size_t count = 24;
@@ -64,9 +61,7 @@ TEST(vector_constructor)
 		CHECK(v.size() == count);
 		vector::iterator it = v.begin(), end = v.end();
 		for (; it != end; ++it)
-		{
 			CHECK(*it == 0);
-		}
 	}
 	{
 		const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -78,8 +73,7 @@ TEST(vector_constructor)
 	}
 }
 
-TEST(vector_assignment)
-{
+TEST(vector_assignment) {
 	typedef tinystl::vector<int> vector;
 
 	{
@@ -96,8 +90,7 @@ TEST(vector_assignment)
 	}
 }
 
-TEST(vector_pushback)
-{
+TEST(vector_pushback) {
 	tinystl::vector<int> v;
 	v.push_back(42);
 
@@ -105,21 +98,18 @@ TEST(vector_pushback)
 	CHECK(v[0] == 42);
 }
 
-TEST(vector_vector)
-{
+TEST(vector_vector) {
 	tinystl::vector< tinystl::vector<int> > v(10, tinystl::vector<int>());
 
 	tinystl::vector< tinystl::vector<int> >::iterator it = v.begin(), end = v.end();
-	for (; it != end; ++it)
-	{
+	for (; it != end; ++it) {
 		CHECK( (*it).empty() );
 		CHECK( (*it).size() == 0 );
 		CHECK( (*it).begin() == (*it).end() );
 	}
 }
 
-TEST(vector_swap)
-{
+TEST(vector_swap) {
 	tinystl::vector<int> v1;
 	v1.push_back(12);
 	v1.push_back(20);
@@ -136,8 +126,7 @@ TEST(vector_swap)
 	CHECK(v2[1] == 20);
 }
 
-TEST(vector_popback)
-{
+TEST(vector_popback) {
 	tinystl::vector<int> v;
 	v.push_back(12);
 	v.push_back(24);
@@ -150,8 +139,7 @@ TEST(vector_popback)
 	CHECK(v.size() == 1);
 }
 
-TEST(vector_assign)
-{
+TEST(vector_assign) {
 	tinystl::vector<int> v;
 
 	CHECK(v.size() == 0);
@@ -162,8 +150,7 @@ TEST(vector_assign)
 	CHECK( std::equal(v.begin(), v.end(), array) );
 }
 
-TEST(vector_erase)
-{
+TEST(vector_erase) {
 	const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 	tinystl::vector<int> v(array, array + 10);
 
@@ -183,8 +170,7 @@ TEST(vector_erase)
 	CHECK(v[1] == 9);
 }
 
-TEST(vector_insert)
-{
+TEST(vector_insert) {
 	const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 	tinystl::vector<int> v(array, array + 10);
 
@@ -206,8 +192,7 @@ TEST(vector_insert)
 	CHECK( std::equal(v.begin(), v.end(), finalarray) );
 }
 
-TEST(vector_iterator)
-{
+TEST(vector_iterator) {
 	const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
 	tinystl::vector<int> v(array, array + 10);

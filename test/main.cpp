@@ -26,7 +26,6 @@
 
 #include <UnitTest++.h>
 
-int main()
-{
+int main() {
 	return UnitTest::RunAllTests();
 }

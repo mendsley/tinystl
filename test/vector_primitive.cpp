@@ -170,6 +170,37 @@ TEST(vector_erase) {
 	CHECK(v[1] == 9);
 }
 
+TEST(vector_erase_unordered) {
+	const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	typedef tinystl::vector<int> vector;
+	vector v(array, array + 10);
+
+    int first = *(v.begin());
+	vector::iterator it = v.erase_unordered(v.begin());
+	CHECK(it == v.begin());
+	CHECK(v.size() == 9);
+	CHECK( std::count(v.begin(), v.end(), first) == 0 );
+	for (it = v.begin(); it != v.end(); ++it) {
+		CHECK( std::count(v.begin(), v.end(), *it) == 1 );
+    }
+
+	int last = *(v.end() - 1);
+	it = v.erase_unordered(v.end() - 1);
+	CHECK(it == v.end());
+	CHECK(v.size() == 8);
+	CHECK( std::count(v.begin(), v.end(), last) == 0 );
+	for (it = v.begin(); it != v.end(); ++it) {
+		CHECK( std::count(v.begin(), v.end(), *it) == 1 );
+	}
+
+	first = *(v.begin());
+	last = *(v.end() - 1);
+	v.erase(v.begin() + 1, v.end() - 1);
+	CHECK(v.size() == 2);
+	CHECK( std::count(v.begin(), v.end(), first) == 1 );
+	CHECK( std::count(v.begin(), v.end(), last) == 1 );
+}
+
 TEST(vector_insert) {
 	const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 	tinystl::vector<int> v(array, array + 10);

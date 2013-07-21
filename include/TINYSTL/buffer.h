@@ -160,7 +160,6 @@ namespace tinystl {
 		if (b->first + newsize > b->capacity)
 			buffer_reserve(b, (newsize * 3) / 2);
 
-		typedef T* pointer;
 		where = b->first + offset;
 		const size_t count = (size_t)(last - first);
 
@@ -176,12 +175,28 @@ namespace tinystl {
 	template<typename T, typename Alloc>
 	static inline T* buffer_erase(buffer<T, Alloc>* b, T* first, T* last) {
 		typedef T* pointer;
+		const size_t range = (last - first);
 		for (pointer it = last, end = b->last, dest = first; it != end; ++it, ++dest)
 			move(*dest, *it);
 
-		buffer_destroy_range(b->last - (last - first), b->last);
+		buffer_destroy_range(b->last - range, b->last);
 
-		b->last -= (last - first);
+		b->last -= range;
+		return first;
+	}
+
+	template<typename T, typename Alloc>
+	static inline T* buffer_erase_unordered(buffer<T, Alloc>* b, T* first, T* last) {
+		typedef T* pointer;
+		const size_t range = (last - first);
+		const size_t tail = (b->last - last);
+		pointer it = b->last - ((range < tail) ? range : tail);
+		for (pointer end = b->last, dest = first; it != end; ++it, ++dest)
+			move(*dest, *it);
+
+		buffer_destroy_range(b->last - range, b->last);
+
+		b->last -= range;
 		return first;
 	}
 

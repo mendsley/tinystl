@@ -30,11 +30,13 @@
 
 namespace tinystl {
 
-	template<typename T> const T& min( const T& a, const T& b ) {
+	template<typename T>
+    static inline const T& min( const T& a, const T& b ) {
 		return (a > b) ? b : a;
 	}
 
-	template<typename T> const T& max( const T& a, const T& b ) {
+	template<typename T>
+    static inline const T& max( const T& a, const T& b ) {
 		return (a < b) ? b : a;
 	}
 }

@@ -85,6 +85,9 @@ namespace tinystl {
 		iterator erase(iterator where);
 		iterator erase(iterator first, iterator last);
 
+		iterator erase_unordered(iterator where);
+		iterator erase_unordered(iterator first, iterator last);
+
 	private:
 		buffer<T, Alloc> m_buffer;
 	};
@@ -249,6 +252,16 @@ namespace tinystl {
 	template<typename T, typename Alloc>
 	inline typename vector<T, Alloc>::iterator vector<T, Alloc>::erase(iterator first, iterator last) {
 		return buffer_erase(&m_buffer, first, last);
+	}
+
+	template<typename T, typename Alloc>
+	inline typename vector<T, Alloc>::iterator vector<T, Alloc>::erase_unordered(iterator where) {
+		return buffer_erase_unordered(&m_buffer, where, where + 1);
+	}
+
+	template<typename T, typename Alloc>
+	inline typename vector<T, Alloc>::iterator vector<T, Alloc>::erase_unordered(iterator first, iterator last) {
+		return buffer_erase_unordered(&m_buffer, first, last);
 	}
 }
 

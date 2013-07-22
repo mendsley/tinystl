@@ -86,7 +86,7 @@ TEST(min) {
 }
 
 TEST(max) {
-	CHECK( tinystl::min(1, 1) == 1 );
+	CHECK( tinystl::max(1, 1) == 1 );
 	CHECK( tinystl::max(1, 2) == 2 );
 	CHECK( tinystl::max(2, 1) == 2 );
 	

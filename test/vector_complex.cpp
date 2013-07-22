@@ -191,6 +191,37 @@ TEST(vector_complex_erase) {
 	CHECK(v[1] == "9");
 }
 
+TEST(vector_complex_erase_unordered) {
+	const complex array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+	typedef tinystl::vector<complex> vector;
+	vector v(array, array + 10);
+
+	complex first = *(v.begin());
+	vector::iterator it = v.erase_unordered(v.begin());
+	CHECK(it == v.begin());
+	CHECK(v.size() == 9);
+	CHECK( std::count(v.begin(), v.end(), first) == 0 );
+	for (it = v.begin(); it != v.end(); ++it) {
+		CHECK( std::count(v.begin(), v.end(), *it) == 1 );
+	}
+
+	complex last = *(v.end() - 1);
+	it = v.erase_unordered(v.end() - 1);
+	CHECK(it == v.end());
+	CHECK(v.size() == 8);
+	CHECK( std::count(v.begin(), v.end(), last) == 0 );
+	for (it = v.begin(); it != v.end(); ++it) {
+		CHECK( std::count(v.begin(), v.end(), *it) == 1 );
+	}
+
+	first = *(v.begin());
+	last = *(v.end() - 1);
+	v.erase_unordered(v.begin() + 1, v.end() - 1);
+	CHECK(v.size() == 2);
+	CHECK( std::count(v.begin(), v.end(), first) == 1 );
+	CHECK( std::count(v.begin(), v.end(), last) == 1 );
+}
+
 TEST(vector_complex_insert) {
 	const complex array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 	tinystl::vector<complex> v(array, array + 10);

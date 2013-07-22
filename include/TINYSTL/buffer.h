@@ -30,6 +30,7 @@
 #include <TINYSTL/allocator.h>
 #include <TINYSTL/new.h>
 #include <TINYSTL/traits.h>
+#include <TINYSTL/algorithm.h>
 
 namespace tinystl {
 
@@ -189,8 +190,9 @@ namespace tinystl {
 	static inline T* buffer_erase_unordered(buffer<T, Alloc>* b, T* first, T* last) {
 		typedef T* pointer;
 		const size_t range = (last - first);
-		for (pointer it = b->last - range, end = b->last, dest = first; it != end; ++it, ++dest)
-		move(*dest, *it);
+		pointer it = b->last - min<size_t>(range, b->last - last);
+		for (pointer end = b->last, dest = first; it != end; ++it, ++dest)
+			move(*dest, *it);
 
 		buffer_destroy_range(b->last - range, b->last);
 

@@ -175,14 +175,14 @@ TEST(vector_erase_unordered) {
 	typedef tinystl::vector<int> vector;
 	vector v(array, array + 10);
 
-    int first = *(v.begin());
+	int first = *(v.begin());
 	vector::iterator it = v.erase_unordered(v.begin());
 	CHECK(it == v.begin());
 	CHECK(v.size() == 9);
 	CHECK( std::count(v.begin(), v.end(), first) == 0 );
 	for (it = v.begin(); it != v.end(); ++it) {
 		CHECK( std::count(v.begin(), v.end(), *it) == 1 );
-    }
+	}
 
 	int last = *(v.end() - 1);
 	it = v.erase_unordered(v.end() - 1);
@@ -195,7 +195,7 @@ TEST(vector_erase_unordered) {
 
 	first = *(v.begin());
 	last = *(v.end() - 1);
-	v.erase(v.begin() + 1, v.end() - 1);
+	v.erase_unordered(v.begin() + 1, v.end() - 1);
 	CHECK(v.size() == 2);
 	CHECK( std::count(v.begin(), v.end(), first) == 1 );
 	CHECK( std::count(v.begin(), v.end(), last) == 1 );

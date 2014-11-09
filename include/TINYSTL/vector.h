@@ -51,6 +51,7 @@ namespace tinystl {
 		const T* data() const;
 		T* data();
 		size_t size() const;
+		size_t capacity() const;
 		bool empty() const;
 
 		T& operator[](size_t idx);
@@ -66,6 +67,8 @@ namespace tinystl {
 
 		void push_back(const T& t);
 		void pop_back();
+
+		void shrink_to_fit();
 
 		void swap(vector& other);
 
@@ -155,6 +158,11 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
+	inline size_t vector<T, Alloc>::capacity() const {
+		return (size_t)(m_buffer.capacity - m_buffer.first);
+	}
+
+	template<typename T, typename Alloc>
 	inline bool vector<T, Alloc>::empty() const {
 		return m_buffer.last == m_buffer.first;
 	}
@@ -207,6 +215,11 @@ namespace tinystl {
 	template<typename T, typename Alloc>
 	inline void vector<T, Alloc>::pop_back() {
 		buffer_erase(&m_buffer, m_buffer.last - 1, m_buffer.last);
+	}
+
+	template<typename T, typename Alloc>
+	inline void vector<T, Alloc>::shrink_to_fit() {
+		buffer_shrink_to_fit(&m_buffer);
 	}
 
 	template<typename T, typename Alloc>

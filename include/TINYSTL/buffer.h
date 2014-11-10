@@ -119,7 +119,7 @@ namespace tinystl {
 	template<typename T, typename Alloc>
 	static inline void buffer_destroy(buffer<T, Alloc>* b) {
 		buffer_destroy_range(b->first, b->last);
-		Alloc::static_deallocate(b->first, (size_t)((char*)b->first - (char*)b->last));
+		Alloc::static_deallocate(b->first, (size_t)((char*)b->capacity - (char*)b->first));
 	}
 
 	template<typename T, typename Alloc>

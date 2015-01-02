@@ -46,7 +46,7 @@ project "test_tinystl"
 
 	includedirs {
 		ROOT_DIR .. "include/",
-		THIRDPARTY_DIR .. "UnitTest++/src/",
+		THIRDPARTY_DIR .. "unittest-cpp/UnitTest++/",
 	}
 
 	links {

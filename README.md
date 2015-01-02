@@ -20,7 +20,8 @@ tinystl is a header only library. But there's some tests that need to be compile
 
 1. Get the premake4 binary here: <http://sourceforge.net/projects/premake/files/Premake/4.4/premake-4.4-beta4-windows.zip/download>
 2. It's one file, put it somewhere useful! (maybe we'll include it in tinystl later on)
-3. Generate project files
+3. Update git submodules: $ git submodule update --init
+4. Generate project files
 		premake4 vs2008
-4. Open your project file. It's in tinystl/.build/projects/
-5. Enjoy a tasty beverage
+5. Open your project file. It's in tinystl/.build/projects/
+6. Enjoy a tasty beverage

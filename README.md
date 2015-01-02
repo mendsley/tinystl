@@ -9,7 +9,7 @@ Contact
 
 License
 -------
-Copyright 2012 Matthew Endsley
+Copyright 2012-2015 Matthew Endsley
 
 This project is governed by the BSD 2-clause license. For details see the file
 titled LICENSE in the project root folder.

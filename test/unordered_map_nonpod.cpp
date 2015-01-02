@@ -1,5 +1,5 @@
 /*-
- * Copyright 2012-2014 Matthew Endsley
+ * Copyright 2012-2015 Matthew Endsley
  * All rights reserved
  *
  * Redistribution and use in source and binary forms, with or without

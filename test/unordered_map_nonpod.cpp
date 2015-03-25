@@ -27,8 +27,11 @@
 #include <TINYSTL/unordered_map.h>
 #include <UnitTest++.h>
 
-TEST(uomap_nonpod_compiles) {
+namespace {
 	struct Foo { int bar; };
+}
+
+TEST(uomap_nonpod_compiles) {
 
 	// verify this compiles
 	typedef tinystl::unordered_map<int, Foo> map;

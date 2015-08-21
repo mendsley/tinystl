@@ -222,7 +222,7 @@ namespace tinystl {
 	template<typename T, typename Alloc>
 	static inline void buffer_insert(buffer<T, Alloc>* b, T* where, size_t count) {
 		where = buffer_insert_common(b, where, count);
-		for (size_t i = 0; i < count; ++i)
+		for (size_t i = 0; i < count; ++i, ++where)
 			new(placeholder(), where) T();
 	}
 

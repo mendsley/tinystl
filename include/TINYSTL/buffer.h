@@ -196,16 +196,16 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	static inline T* buffer_insert_common(buffer<T, Alloc>* b, T* where, size_t count) {
+	static inline T* buffer_insert_common(buffer<T, Alloc>* b, T* where, size_t range) {
 		const size_t offset = (size_t)(where - b->first);
-		const size_t newsize = (size_t)((b->last - b->first) + count);
+		const size_t newsize = (size_t)((b->last - b->first) + range);
 		if (b->first + newsize > b->capacity)
 			buffer_reserve(b, (newsize * 3) / 2);
 
 		where = b->first + offset;
 
 		if (where != b->last)
-			buffer_bmove_urange(where + count, where, b->last);
+			buffer_bmove_urange(where + range, where, b->last);
 
 		b->last = b->first + newsize;
 
@@ -214,15 +214,28 @@ namespace tinystl {
 
 	template<typename T, typename Alloc, typename Param>
 	static inline void buffer_insert(buffer<T, Alloc>* b, T* where, const Param* first, const Param* last) {
-		where = buffer_insert_common(b, where, last - first);
+		typedef const char* pointer;
+		const size_t range = last - first;
+		const bool frombuf = ((pointer)b->first <= (pointer)first && (pointer)b->last >= (pointer)last);
+		size_t offset;
+		if (frombuf) {
+			offset = (pointer)first - (pointer)b->first;
+			if ((pointer)where <= (pointer)first)
+				offset += range * sizeof(T);
+		}
+		where = buffer_insert_common(b, where, range);
+		if (frombuf) {
+			first = (Param*)((pointer)b->first + offset);
+			last = first + range;
+		}
 		for (; first != last; ++first, ++where)
 			new(placeholder(), where) T(*first);
 	}
 
 	template<typename T, typename Alloc>
-	static inline void buffer_insert(buffer<T, Alloc>* b, T* where, size_t count) {
-		where = buffer_insert_common(b, where, count);
-		for (size_t i = 0; i < count; ++i, ++where)
+	static inline void buffer_insert(buffer<T, Alloc>* b, T* where, size_t range) {
+		where = buffer_insert_common(b, where, range);
+		for (size_t i = 0; i < range; ++i, ++where)
 			new(placeholder(), where) T();
 	}
 

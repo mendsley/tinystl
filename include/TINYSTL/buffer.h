@@ -241,6 +241,26 @@ namespace tinystl {
 			new(placeholder(), where) T();
 	}
 
+	template<typename T, typename Alloc, typename Param>
+	static inline void buffer_append(buffer<T, Alloc>* b, const Param* param) {
+		if (b->capacity != b->last) {
+			new(placeholder(), b->last) T(*param);
+			++b->last;
+		} else {
+			buffer_insert(b, b->last, param, param + 1);
+		}
+	}
+
+	template<typename T, typename Alloc>
+	static inline void buffer_append(buffer<T, Alloc>* b) {
+		if (b->capacity != b->last) {
+			new(placeholder(), b->last) T();
+			++b->last;
+		} else {
+			buffer_insert(b, b->last, 1);
+		}
+	}
+
 	template<typename T, typename Alloc>
 	static inline T* buffer_erase(buffer<T, Alloc>* b, T* first, T* last) {
 		typedef T* pointer;

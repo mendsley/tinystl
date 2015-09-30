@@ -180,9 +180,11 @@ namespace tinystl {
 			Alloc::static_deallocate(b->first, sizeof(T)*capacity);
 			b->capacity = b->first;
 		} else if (b->capacity != b->last) {
+			const size_t capacity = (size_t)(b->capacity - b->first);
 			const size_t size = (size_t)(b->last - b->first);
 			T* newfirst = (T*)Alloc::static_allocate(sizeof(T) * size);
 			buffer_move_urange(newfirst, b->first, b->last);
+			Alloc::static_deallocate(b->first, sizeof(T) * capacity);
 			b->first = newfirst;
 			b->last = newfirst + size;
 			b->capacity = b->last;

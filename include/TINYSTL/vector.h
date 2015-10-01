@@ -232,15 +232,13 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	inline void vector<T, Alloc>::emplace_back()
-	{
+	inline void vector<T, Alloc>::emplace_back() {
 		buffer_append(&m_buffer);
 	}
 
 	template<typename T, typename Alloc>
 	template<typename Param>
-	inline void vector<T, Alloc>::emplace_back(const Param& param)
-	{
+	inline void vector<T, Alloc>::emplace_back(const Param& param) {
 		buffer_append(&m_buffer, &param);
 	}
 

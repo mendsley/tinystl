@@ -28,34 +28,12 @@
 #include <UnitTest++.h>
 #include <string.h>
 
-TEST(test_reserve) {
+TEST(test_append) {
 	tinystl::string s;
-	s.reserve(0);
-	CHECK(s.capacity() == 15);
-	s.reserve(10);
-	s = "short";
-	CHECK(s.capacity() == 15);
-	CHECK(s == "short");
-	s.reserve(15);
-	CHECK(s.capacity() == 15);
-	CHECK(s == "short");
-	s.reserve(100);
-	CHECK(s.capacity() == 100);
-	CHECK(s == "short");
-	s.reserve(101);
-	CHECK(s.capacity() == 101);
-	CHECK(s == "short");
-}
-
-TEST(test_resize) {
-	tinystl::string s;
-	s.resize(1, ' ');
-	CHECK(s == " ");
-	s.resize(16, '+');
-	CHECK(s == " +++++++++++++++");
-	s.clear();
-	s.resize(16, '@');
-	CHECK(s == "@@@@@@@@@@@@@@@@");
-	s.resize(12, '-');
-	CHECK(s == "@@@@@@@@@@@@");
+	s += "hello";
+	s += ' ';
+	s += "world";
+	CHECK(s == "hello world");
+	s += " and this is a very long string";
+	CHECK(s == "hello world and this is a very long string");
 }

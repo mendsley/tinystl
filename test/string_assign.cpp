@@ -30,7 +30,7 @@
 
 TEST(test_empty) {
 	tinystl::string s;
-	CHECK(s.size() == 0);
+	CHECK(s.empty());
 	CHECK(s.capacity() == 15);
 	CHECK(s.begin() == s.end());
 	CHECK(strlen(s.c_str()) == 0);
@@ -39,7 +39,7 @@ TEST(test_empty) {
 
 TEST(test_small) {
 	tinystl::string s1("");
-	CHECK(s1.size() == 0);
+	CHECK(s1.empty());
 	CHECK(s1.capacity() == 15);
 	CHECK(s1.begin() == s1.end());
 	CHECK(strlen(s1.c_str()) == 0);
@@ -73,14 +73,14 @@ TEST(test_long) {
 
 TEST(test_assign) {
 	tinystl::string s;
-	const char* originsmall = "small";
-	size_t lensmall = strlen(originsmall);
-	s = originsmall;
-	CHECK(s.size() == lensmall);
+	const char* originshort = "short";
+	size_t lenshort = strlen(originshort);
+	s = originshort;
+	CHECK(s.size() == lenshort);
 	CHECK(s.capacity() == 15);
-	CHECK(s.begin() + lensmall == s.end());
-	CHECK(strlen(s.c_str()) == lensmall);
-	CHECK(s == originsmall);
+	CHECK(s.begin() + lenshort == s.end());
+	CHECK(strlen(s.c_str()) == lenshort);
+	CHECK(s == originshort);
 
 	const char* originlong = "long long long long long long long long long long long long";
 	size_t lenlong = strlen(originlong);
@@ -91,10 +91,33 @@ TEST(test_assign) {
 	CHECK(strlen(s.c_str()) == lenlong);
 	CHECK(s == originlong);
 
-	s = originsmall;
-	CHECK(s.size() == lensmall);
+	s = originshort;
+	CHECK(s.size() == lenshort);
 	CHECK(s.capacity() == lenlong);
-	CHECK(s.begin() + lensmall == s.end());
-	CHECK(strlen(s.c_str()) == lensmall);
-	CHECK(s == originsmall);
+	CHECK(s.begin() + lenshort == s.end());
+	CHECK(strlen(s.c_str()) == lenshort);
+	CHECK(s == originshort);
+}
+
+TEST(test_swap) {
+	tinystl::string ss1("short");
+	tinystl::string ss2("another");
+	tinystl::string sl1("long string for testing purposes");
+	tinystl::string sl2("another long string for testing purposes");
+
+	ss1.swap(ss2);
+	CHECK(ss1 == "another");
+	CHECK(ss2 == "short");
+
+	sl1.swap(sl2);
+	CHECK(sl1 == "another long string for testing purposes");
+	CHECK(sl2 == "long string for testing purposes");
+
+	ss1.swap(sl2);
+	CHECK(ss1 == "long string for testing purposes");
+	CHECK(sl2 == "another");
+
+	sl1.swap(ss2);
+	CHECK(sl1 == "short");
+	CHECK(ss2 == "another long string for testing purposes");
 }

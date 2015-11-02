@@ -42,16 +42,30 @@ namespace tinystl {
 		~string();
 
 		string& operator=(const string& other);
+		string& operator=(char ch);
+		string& operator=(const char* sz);
+
+		string& operator+=(const string& other);
+		string& operator+=(char ch);
+		string& operator+=(const char* sz);
 
 		const char* c_str() const;
+		bool empty() const;
 		size_t size() const;
 		size_t capacity() const;
 
 		void reserve(size_t capacity);
-		void resize(size_t size);
+		void resize(size_t newsize);
+		void resize(size_t newsize, char ch);
 
+		void clear();
+
+		void assign(char ch);
+		void assign(const char* sz);
 		void assign(const char* first, const char* last);
 
+		void push_back(char ch);
+		void append(const char* sz);
 		void append(const char* first, const char* last);
 
 		void swap(string& other);
@@ -93,11 +107,7 @@ namespace tinystl {
 	inline string::string(const char* sz)
 		: m_size(0)
 	{
-		size_t len = 0;
-		for (const char* it = sz; *it; ++it)
-			++len;
-
-		assign(sz, sz + len);
+		assign(sz);
 	}
 
 	inline string::string(const char* sz, size_t len)
@@ -117,11 +127,40 @@ namespace tinystl {
 		return *this;
 	}
 
+	inline string& string::operator=(char ch) {
+		assign(ch);
+		return *this;
+	}
+
+	inline string& string::operator=(const char* sz) {
+		assign(sz);
+		return *this;
+	}
+
+	inline string& string::operator+=(const string& other) {
+		append(other.begin(), other.end());
+		return *this;
+	}
+
+	inline string& string::operator+=(char ch) {
+		push_back(ch);
+		return *this;
+	}
+
+	inline string& string::operator+=(const char* sz) {
+		append(sz);
+		return *this;
+	}
+
 	inline const char* string::c_str() const {
 		if (m_size & c_longflag)
 			return m_first;
 		else
 			return m_buffer;
+	}
+
+	inline bool string::empty() const {
+		return size() == 0;
 	}
 
 	inline size_t string::size() const {
@@ -153,13 +192,36 @@ namespace tinystl {
 		m_capacity = m_first + cap + 1;
 	}
 
-	inline void string::resize(size_t size) {
-		reserve(size);
-		pointer newend = begin() + size;
-		for (pointer it = end(); it != newend; ++it)
-			*it = 0;
-		*newend = 0;
-		m_size = size;
+	inline void string::resize(size_t newsize) {
+		resize(newsize, 0);
+	}
+
+	inline void string::resize(size_t newsize, char ch) {
+		if (size() < newsize) {
+			reserve(newsize);
+			for (pointer it = end(), newend = begin() + newsize; it != newend; ++it)
+				*it = ch;
+		}
+		m_size = newsize | (m_size & c_longflag);
+		*end() = 0;
+	}
+
+	inline void string::clear() {
+		resize(0);
+	}
+
+	inline void string::assign(char ch) {
+		m_size = 1 | (m_size & c_longflag);
+		*begin() = ch;
+		*end() = 0;
+	}
+
+	inline void string::assign(const char* sz) {
+		size_t len = 0;
+		for (const char *it = sz; *it; ++it)
+			++len;
+
+		assign(sz, sz + len);
 	}
 
 	inline void string::assign(const char* first, const char* last) {
@@ -171,6 +233,24 @@ namespace tinystl {
 			*newit = *it;
 		*newit = 0;
 		m_size = newsize | (m_size & c_longflag);
+	}
+
+	inline void string::push_back(char ch) {
+		if (size() + 1 < capacity()) {
+			char* e = end();
+			*e = ch;
+			*(e + 1) = 0;
+			++m_size;
+		} else {
+			append(&ch, &ch + 1);
+		}
+	}
+
+	inline void string::append(const char *sz) {
+		size_t len = 0;
+		for (const char *it = sz; *it; ++it)
+			++len;
+		append(sz, sz + len);
 	}
 
 	inline void string::append(const char* first, const char* last) {
@@ -259,6 +339,32 @@ namespace tinystl {
 				return false;
 
 		return true;
+	}
+
+	inline bool operator==(const string& lhs, const char* rhs) {
+		typedef const char* pointer;
+
+		const size_t lsize = lhs.size();
+		for (pointer lit = lhs.c_str(), rit = rhs, lend = lit + lsize; lit != lend; ++lit, ++rit)
+			if (*lit != *rit)
+				return false;
+		return *(rhs + lsize) == 0;
+	}
+
+	inline bool operator==(const char* lhs, const string& rhs) {
+		return rhs == lhs;
+	}
+
+	inline bool operator!=(const string& lhs, const string& rhs) {
+		return !(lhs == rhs);
+	}
+
+	inline bool operator!=(const string& lhs, const char* rhs) {
+		return !(lhs == rhs);
+	}
+
+	inline bool operator!=(const char* lhs, const string& rhs) {
+		return !(lhs == rhs);
 	}
 
 	static inline size_t hash(const string& value) {

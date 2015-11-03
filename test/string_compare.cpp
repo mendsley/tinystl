@@ -26,8 +26,6 @@
 
 #include <TINYSTL/string.h>
 #include <UnitTest++.h>
-#include <string.h>
-
 TEST(test_equal) {
 	tinystl::string s("hello");
 	CHECK(s == tinystl::string("hello"));
@@ -36,4 +34,37 @@ TEST(test_equal) {
 	CHECK(s != tinystl::string("hello world"));
 	CHECK(s != "hello world");
 	CHECK("hello world" != s);
+}
+
+TEST(test_ltgt) {
+	tinystl::string s("hello");
+	CHECK(!(s < "hello"));
+	CHECK(s < "helloo");
+	CHECK(s < "hello0");
+	CHECK(s > "he1");
+	CHECK(s > "hell");
+	CHECK(s > "a");
+	CHECK(s < "z");
+	CHECK(s > "aaaaaaaa");
+	CHECK(s < "zzzzzzzz");
+	CHECK(s > "hella");
+	CHECK(s < "hellz");
+	CHECK(s < "hellz");
+}
+
+TEST(test_lege) {
+	tinystl::string s("hello");
+	CHECK(s <= "hello");
+	CHECK(s >= "hello");
+	CHECK(s <= "helloo");
+	CHECK(s <= "hello0");
+	CHECK(s >= "he1");
+	CHECK(s >= "hell");
+	CHECK(s >= "a");
+	CHECK(s <= "z");
+	CHECK(s >= "aaaaaaaa");
+	CHECK(s <= "zzzzzzzz");
+	CHECK(s >= "hella");
+	CHECK(s <= "hellz");
+	CHECK(s <= "hellz");
 }

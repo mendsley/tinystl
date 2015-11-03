@@ -26,7 +26,6 @@
 
 #include <TINYSTL/string.h>
 #include <UnitTest++.h>
-#include <string.h>
 
 TEST(test_append) {
 	tinystl::string s;
@@ -36,4 +35,37 @@ TEST(test_append) {
 	CHECK(s == "hello world");
 	s += " and this is a very long string";
 	CHECK(s == "hello world and this is a very long string");
+}
+
+TEST(test_add) {
+	CHECK(tinystl::string("hello") + tinystl::string(" world") == "hello world");
+	CHECK(tinystl::string("hello") + " world" == "hello world");
+	CHECK(tinystl::string("hello") + " " + "world" == "hello world");
+	CHECK("hello" + tinystl::string(" ") + "world" == "hello world");
+}
+
+TEST(test_insert) {
+	tinystl::string s("world");
+	s.insert(s.end(), '!');
+	CHECK(s == "world!");
+	s.insert(s.begin(), "hello");
+	CHECK(s == "helloworld!");
+	s.insert(s.begin() + 5, " ");
+	CHECK(s == "hello world!");
+	s.insert(s.end() - 1, ", prepend a huge string to check");
+	CHECK(s == "hello world, prepend a huge string to check!");
+}
+
+TEST(test_erase) {
+	tinystl::string s("hello");
+	s.erase(s.begin(), s.end());
+	CHECK(s.empty());
+	s = "hello";
+	s.erase(s.end() - 1, s.end());
+	CHECK(s == "hell");
+	s = "hello world and this is a very long string";
+	s.erase(s.begin(), s.begin() + 4);
+	CHECK(s == "o world and this is a very long string");
+	s.erase(s.begin(), s.end());
+	CHECK(s.empty());
 }

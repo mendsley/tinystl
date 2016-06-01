@@ -298,4 +298,4 @@ namespace tinystl {
 	}
 }
 
-#endif
+#endif //TINYSTL_BUFFER_H

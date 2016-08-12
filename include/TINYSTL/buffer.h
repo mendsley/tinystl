@@ -224,11 +224,12 @@ namespace tinystl {
 			offset = (pointer)first - (pointer)b->first;
 			if ((pointer)where <= (pointer)first)
 				offset += count * sizeof(T);
-		}
-		where = buffer_insert_common(b, where, count);
-		if (frombuf) {
+			where = buffer_insert_common(b, where, count);
 			first = (Param*)((pointer)b->first + offset);
 			last = first + count;
+		}
+		else {
+			where = buffer_insert_common(b, where, count);
 		}
 		for (; first != last; ++first, ++where)
 			new(placeholder(), where) T(*first);

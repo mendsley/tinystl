@@ -80,6 +80,21 @@ namespace tinystl {
 	static inline void move_construct(T* a, T& b) {
 		move_construct_impl(a, b, (T*)0);
 	}
+
+	template<typename T>
+	struct remove_reference {
+		typedef T type;
+	};
+
+	template<typename T>
+	struct remove_reference<T&> {
+		typedef T type;
+	};
+
+	template<typename T>
+	struct remove_reference<T&&> {
+		typedef T type;
+	};
 }
 
 #endif

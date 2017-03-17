@@ -297,6 +297,12 @@ namespace tinystl {
 		b->first = other->first, b->last = other->last, b->capacity = other->capacity;
 		other->first = tfirst, other->last = tlast, other->capacity = tcapacity;
 	}
+
+	template<typename T, typename Alloc>
+	static inline void buffer_move(buffer<T, Alloc>* dst, buffer<T, Alloc>* src) {
+		dst->first = src->first, dst->last = src->last, dst->capacity = src->capacity;
+		src->first = src->last = src->capacity = nullptr;
+	}
 }
 
 #endif //TINYSTL_BUFFER_H

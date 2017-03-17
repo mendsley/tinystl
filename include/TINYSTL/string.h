@@ -38,11 +38,13 @@ namespace tinystl {
 	public:
 		basic_string();
 		basic_string(const basic_string& other);
+		basic_string(basic_string&& other);
 		basic_string(const char* sz);
 		basic_string(const char* sz, size_t len);
 		~basic_string();
 
 		basic_string& operator=(const basic_string& other);
+		basic_string& operator=(basic_string&& other);
 
 		const char* c_str() const;
 		size_t size() const;
@@ -87,6 +89,25 @@ namespace tinystl {
 	}
 
 	template<typename allocator>
+	inline basic_string<allocator>::basic_string(basic_string&& other)
+	{
+		if (other.m_first == other.m_buffer) {
+			m_first = m_buffer;
+			m_last = m_buffer;
+			m_capacity = m_buffer + c_nbuffer;
+			reserve(other.size());
+			append(other.m_first, other.m_last);
+		} else {
+			m_first = other.m_first;
+			m_last = other.m_last;
+			m_capacity = other.m_capacity;
+		}
+		other.m_first = other.m_last = other.m_buffer;
+		other.m_capacity = other.m_buffer + c_nbuffer;
+		other.resize(0);
+	}
+
+	template<typename allocator>
 	inline basic_string<allocator>::basic_string(const char* sz)
 		: m_first(m_buffer)
 		, m_last(m_buffer)
@@ -119,6 +140,12 @@ namespace tinystl {
 	template<typename allocator>
 	inline basic_string<allocator>& basic_string<allocator>::operator=(const basic_string& other) {
 		basic_string(other).swap(*this);
+		return *this;
+	}
+
+	template<typename allocator>
+	inline basic_string<allocator>& basic_string<allocator>::operator=(basic_string&& other) {
+		basic_string(static_cast<basic_string&&>(other)).swap(*this);
 		return *this;
 	}
 

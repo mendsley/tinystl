@@ -38,12 +38,14 @@ namespace tinystl {
 	public:
 		vector();
 		vector(const vector& other);
+		vector(vector&& other);
 		vector(size_t size);
 		vector(size_t size, const T& value);
 		vector(const T* first, const T* last);
 		~vector();
 
 		vector& operator=(const vector& other);
+		vector& operator=(const vector&& other);
 
 		void assign(const T* first, const T* last);
 
@@ -117,6 +119,11 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
+	inline vector<T, Alloc>::vector(vector&& other) {
+		buffer_move(&m_buffer, &other.m_buffer);
+	}
+
+	template<typename T, typename Alloc>
 	inline vector<T, Alloc>::vector(size_t size) {
 		buffer_init(&m_buffer);
 		buffer_resize(&m_buffer, size);
@@ -142,6 +149,13 @@ namespace tinystl {
 	template<typename T, typename Alloc>
 	inline vector<T, Alloc>& vector<T, Alloc>::operator=(const vector& other) {
 		vector(other).swap(*this);
+		return *this;
+	}
+
+	template<typename T, typename Alloc>
+	vector<T, Alloc>& vector<T, Alloc>::operator=(const vector&& other) {
+		buffer_destroy(&m_buffer);
+		buffer_move(&m_buffer, &other.m_buffer);
 		return *this;
 	}
 
@@ -319,4 +333,4 @@ namespace tinystl {
 	}
 }
 
-#endif 
+#endif // TINYSTL_VECTOR_H

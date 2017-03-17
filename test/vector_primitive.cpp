@@ -27,6 +27,7 @@
 #include <TINYSTL/vector.h>
 #include <UnitTest++.h>
 #include <algorithm>
+#include <utility>
 
 TEST(vector_constructor) {
 	typedef tinystl::vector<int> vector;
@@ -70,6 +71,16 @@ TEST(vector_constructor) {
 
 		CHECK( v.size() == other.size() );
 		CHECK( std::equal(v.begin(), v.end(), other.begin()) );
+	}
+
+	{
+		const int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+		vector other(array, array + 10);
+		vector v = std::move(other);
+
+		CHECK(v.size() == 10);
+		CHECK(std::equal(v.begin(), v.end(), array));
+		CHECK(other.size() == 0);
 	}
 }
 
@@ -132,7 +143,7 @@ TEST(vector_popback) {
 	v.push_back(24);
 
 	CHECK(v.back() == 24);
-	
+
 	v.pop_back();
 
 	CHECK(v.back() == 12);

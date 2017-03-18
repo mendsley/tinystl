@@ -64,3 +64,12 @@ TEST(vector_shrinktofit) {
 		CHECK(v.data() == ptr);
 	}
 }
+
+TEST(vector_shrinktofit_multiple) {
+	typedef tinystl::vector<int> vector;
+
+	vector v(10, 0);
+	v.clear();
+	v.shrink_to_fit();
+	v.shrink_to_fit();
+}

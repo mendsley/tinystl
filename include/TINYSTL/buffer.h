@@ -175,19 +175,21 @@ namespace tinystl {
 
 	template<typename T, typename Alloc>
 	static inline void buffer_shrink_to_fit(buffer<T, Alloc>* b) {
-		if (b->last == b->first) {
-			const size_t capacity = (size_t)(b->last - b->first);
-			Alloc::static_deallocate(b->first, sizeof(T)*capacity);
-			b->capacity = b->first;
-		} else if (b->capacity != b->last) {
-			const size_t capacity = (size_t)(b->capacity - b->first);
-			const size_t size = (size_t)(b->last - b->first);
-			T* newfirst = (T*)Alloc::static_allocate(sizeof(T) * size);
-			buffer_move_urange(newfirst, b->first, b->last);
-			Alloc::static_deallocate(b->first, sizeof(T) * capacity);
-			b->first = newfirst;
-			b->last = newfirst + size;
-			b->capacity = b->last;
+		if (b->capacity != b->last) {
+			if (b->last == b->first) {
+				const size_t capacity = (size_t)(b->capacity - b->first);
+				Alloc::static_deallocate(b->first, sizeof(T)*capacity);
+				b->capacity = b->first = b->last = nullptr;
+			} else {
+				const size_t capacity = (size_t)(b->capacity - b->first);
+				const size_t size = (size_t)(b->last - b->first);
+				T* newfirst = (T*)Alloc::static_allocate(sizeof(T) * size);
+				buffer_move_urange(newfirst, b->first, b->last);
+				Alloc::static_deallocate(b->first, sizeof(T) * capacity);
+				b->first = newfirst;
+				b->last = newfirst + size;
+				b->capacity = b->last;
+			}
 		}
 	}
 

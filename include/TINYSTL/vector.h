@@ -45,7 +45,7 @@ namespace tinystl {
 		~vector();
 
 		vector& operator=(const vector& other);
-		vector& operator=(const vector&& other);
+		vector& operator=(vector&& other);
 
 		void assign(const T* first, const T* last);
 
@@ -153,7 +153,7 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	vector<T, Alloc>& vector<T, Alloc>::operator=(const vector&& other) {
+	vector<T, Alloc>& vector<T, Alloc>::operator=(vector&& other) {
 		buffer_destroy(&m_buffer);
 		buffer_move(&m_buffer, &other.m_buffer);
 		return *this;

@@ -14,16 +14,16 @@ solution "tinystl"
 	}
 
 	language "C++"
+	rtti "Off"
+	editandcontinue "Off"
+	warnings "Extra"
+	symbols "On"
 
 	flags {
 		"StaticRuntime",
 		"NoMinimalRebuild",
 		"NoPCH",
-		"NoRTTI",
-		"NoEditAndContinue",
-		"ExtraWarnings",
 		"FatalWarnings",
-		"Symbols",
 	}
 
 	includedirs {

@@ -1,8 +1,9 @@
 project "UnitTest++"
 	kind "StaticLib"
 
+	warnings "Extra"
+
 	flags {
-		"ExtraWarnings",
 		"FatalWarnings",
 	}
 

@@ -85,7 +85,6 @@ namespace tinystl {
 		: m_size(0)
 	{
 		buffer_init<pointer, Alloc>(&m_buckets);
-		buffer_resize<pointer, Alloc>(&m_buckets, 9, 0);
 	}
 
 	template<typename Key, typename Value, typename Alloc>
@@ -230,6 +229,7 @@ namespace tinystl {
 		unordered_hash_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_hash_node<Key, Value>))) unordered_hash_node<Key, Value>(p.first, p.second);
 		newnode->next = newnode->prev = 0;
 
+		if(!m_buckets.first) buffer_resize<pointer, Alloc>(&m_buckets, 9, 0);
 		const size_t nbuckets = (size_t)(m_buckets.last - m_buckets.first);
 		unordered_hash_node_insert(newnode, hash(p.first), m_buckets.first, nbuckets - 1);
 
@@ -254,6 +254,7 @@ namespace tinystl {
 		unordered_hash_node<Key, Value>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_hash_node<Key, Value>))) unordered_hash_node<Key, Value>(static_cast<Key&&>(p.first), static_cast<Value&&>(p.second));
 		newnode->next = newnode->prev = 0;
 
+		if (!m_buckets.first) buffer_resize<pointer, Alloc>(&m_buckets, 9, 0);
 		const size_t nbuckets = (size_t)(m_buckets.last - m_buckets.first);
 		unordered_hash_node_insert(newnode, keyhash, m_buckets.first, nbuckets - 1);
 

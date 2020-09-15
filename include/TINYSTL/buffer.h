@@ -141,7 +141,7 @@ namespace tinystl {
 
 	template<typename T, typename Alloc>
 	static inline void buffer_reserve(buffer<T, Alloc>* b, size_t capacity) {
-		if (b->first + capacity <= b->capacity)
+		if (b->first && b->first + capacity <= b->capacity)
 			return;
 
 		typedef T* pointer;
